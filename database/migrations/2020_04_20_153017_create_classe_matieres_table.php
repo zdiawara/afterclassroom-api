@@ -14,6 +14,7 @@ class CreateClasseMatieresTable extends Migration
     public function up()
     {
         Schema::create('classe_matiere', function (Blueprint $table) {
+			$table->id();
             $table->unsignedBigInteger('classe_id');
             $table->unsignedBigInteger('matiere_id');
             $table->unsignedBigInteger('country_id');
