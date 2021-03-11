@@ -115,11 +115,12 @@ class DatabaseSeeder extends Seeder
         collect($data)->each(function ($item, $country) {
             collect($item)->each(function ($matieres, $classe) use ($country) {
                 collect($matieres)->each(function ($matiere) use ($classe, $country) {
-                    (new ClasseMatiere([
+                    $classeMatiere = new ClasseMatiere([
                         'classe_id' => $classe,
                         'matiere_id' => $matiere,
                         'country_id' => $country
-                    ]))->save();
+                    ]);
+					$classeMatiere->save();
                 });
             });
         });
@@ -352,17 +353,6 @@ class DatabaseSeeder extends Seeder
             'abreviation' => $abreviation,
             'position' => $position
         ]);
-    }
-
-    private function generateOption($names = [], $classe)
-    {
-        foreach ($names as $name) {
-            $option = new Option();
-            $option->name = $name;
-            $option->classe_id = $classe->id;
-            $option->code = $classe->code . '_' . strtolower($name);
-            $option->save();
-        }
     }
 
     private function createTeacher($firstname, $lastname, $email, $username, $matieres, $level)
