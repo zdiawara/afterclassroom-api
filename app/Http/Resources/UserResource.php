@@ -15,7 +15,7 @@ class UserResource extends JsonResource
      */
     public function toArray($request)
     {
-        $model = is_null($this->user) ? this : $this->user;
+        $model = is_null($this->user) ? $this : $this->user;
 
         //$model->load('gender');
         //dd($this->user->gender);
@@ -27,10 +27,10 @@ class UserResource extends JsonResource
             'email' => $model->email,
             'username' => $model->username,
             'id' => (string) $model->userable_id,
-            'avatar' => url('api/files/'.File::PATH_IMAGES.'/'.$model->avatar),
+            'avatar' => url('api/files/' . File::PATH_IMAGES . '/' . $model->avatar),
         ];
 
-        if(!is_null($this->user)){
+        if (!is_null($this->user)) {
             $fields['gender'] = new ReferentielResource($this->user->gender);
         }
 

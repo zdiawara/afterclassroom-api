@@ -43,7 +43,7 @@ class Controller extends BaseController
             }
 
             if (isset($content['active'])) {
-                $response['active_' . $field] = $content['active'];
+                $response['is_' . $field . '_active'] = $content['active'];
             }
         }
         return $response;

@@ -14,24 +14,16 @@ class ClasseResource extends JsonResource
      */
     public function toArray($request)
     {
-        $classe = [
+        return [
             'id' => (string) $this->id,
             'name' => $this->name,
             'abreviation' => $this->abreviation,
             'position' => $this->position,
             'code' => $this->code,
-            'matieres' => MatiereResource::collection($this->whenLoaded('matieres')),
+            'hasFaq' => (string) $this->has_faq,
+            'isExamClass' => (string) $this->is_exam_class,
             'level' => new ReferentielResource($this->whenLoaded('level')),
+            'matieres' => MatiereResource::collection($this->whenLoaded('matieres')),
         ];
-
-        if (isset($this->exercises_count)) {
-            $classe['exercises_count'] = $this->exercises_count;
-        }
-
-        if (isset($this->controles_count)) {
-            $classe['controles_count'] = $this->controles_count;
-        }
-
-        return $classe;
     }
 }

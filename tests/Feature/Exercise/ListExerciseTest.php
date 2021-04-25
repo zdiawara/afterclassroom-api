@@ -17,22 +17,15 @@ class ListExerciseTest extends TestCase
     public function show_chapter_exercises()
     {
         $this->withoutExceptionHandling();
-        
         $result = $this->createChapter();
-        
-        \factory(Exercise::class,5)->make()->each(function ($exercise) use ($result){
-            $response = $this->actingAs($result['teacher']->user)->post(
-                route('chapters.exercises.store',["chapter"=>Chapter::first()->id]),
-                $exercise->toArray()
-            );
+        $SIZE = 5;
+        factory(Exercise::class, $SIZE)->make()->each(function () use ($result) {
+            $this->createExercise($result['chapter']);
         });
-
         $response = $this->actingAs($result['teacher']->user)->get(
-            route('chapters.exercises.index',["chapter"=>Chapter::first()->id])
+            route('chapters.showExercises', ["chapter" => Chapter::first()->id])
         );
-
         $response->assertStatus(Response::HTTP_OK);
-
-        $this->assertEquals(5,sizeof($response->json()['data']));
+        $this->assertEquals($SIZE, sizeof($response->json()['data']));
     }
 }

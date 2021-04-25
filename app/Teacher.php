@@ -29,6 +29,11 @@ class Teacher extends Model
         return $this->belongsToMany(Matiere::class);
     }
 
+    public function matiereTeachers()
+    {
+        return $this->hasMany(MatiereTeacher::class);
+    }
+
     public function chapters()
     {
         return $this->hasMany(Chapter::class);

@@ -16,11 +16,9 @@ class CreateStudentsTable extends Migration
         Schema::create('students', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('classe_id');
-            $table->unsignedBigInteger('option_id')->nullable();
             $table->timestamps();
 
             $table->foreign('classe_id')->references('id')->on('classes');
-            $table->foreign('option_id')->references('id')->on('options');
         });
     }
 

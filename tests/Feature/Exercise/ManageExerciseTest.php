@@ -2,17 +2,15 @@
 
 namespace Tests\Feature\Exercise;
 
-
-use App\Chapter;
-use App\Exercise;
 use Tests\TestCase;
 use App\Referentiel;
 use App\Constants\CodeReferentiel;
 use App\Constants\TypeReferentiel;
+use App\Http\Resources\ExerciseResource;
 use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
-class UpdateExerciseTest extends TestCase
+class ManageExerciseTest extends TestCase
 {
     use RefreshDatabase;
 
@@ -20,7 +18,7 @@ class UpdateExerciseTest extends TestCase
     public function a_teacher_can_add_exercise_to_chapter()
     {
         $this->withoutExceptionHandling();
-        
+
         $result = $this->createExercise();
 
         $result['response']
@@ -31,47 +29,59 @@ class UpdateExerciseTest extends TestCase
     public function a_teacher_can_update_exercise()
     {
         $this->withoutExceptionHandling();
-        
+
         $result = $this->createExercise();
 
         $exercise = $result['exercise'];
-            
-        $type = Referentiel::firstOrCreate([
-            'code' => CodeReferentiel::SYNTHESE,
-            'type' => TypeReferentiel::EXERCISE
-        ],['name' => 'Test',]);
+
+        $type = Referentiel::firstOrCreate(
+            ['code' => CodeReferentiel::SYNTHESE, 'type' => TypeReferentiel::EXERCISE],
+            ['name' => 'Test', 'position' => 0]
+        );
+
+        $exercise->enonce = "Test enonce";
+        $exercise->is_enonce_active = 0;
+        $exercise->correction = "Test correction";
+        $exercise->type_id = $type->code;
 
         $response = $this->actingAs($exercise->chapter->teacher->user)->put(
-            route('exercises.update',[ "exercise"=> $exercise->id]),
+            route('exercises.update', ["exercise" => $exercise->id]),
             [
-                "type" => $type->id,
+                "type" => $type->code,
                 "enonce" => [
-                    'data' => 'enoncé',
-                    'active' => '0'
+                    'data' =>  $exercise->enonce,
+                    'active' =>  $exercise->is_enonce_active
+                ],
+                "correction" => [
+                    "data" => $exercise->correction,
                 ]
             ]
         );
 
-        $exercise = Exercise::first();
-        $this->assertTrue($type->id==$exercise->type->id);
+        $response
+            ->assertStatus(Response::HTTP_CREATED)
+            ->assertJson($this->decodeResource(new ExerciseResource($exercise)));
     }
 
     /** @test **/
     public function active_exercise()
     {
         $this->withoutExceptionHandling();
-        
-        $result = $this->createExerciseForChapter();
-    
-        $response = $this->actingAs($result['teacher']->user)->put(
-            route('exercises.update',[ "exercise"=> $result['exercise']->id]),
-            ["active" => 1]
-        );
 
-        $exercise = Exercise::first();
-        $this->assertTrue($exercise->active==1);
-        $this->assertTrue($exercise->content->active==1);
-        $this->assertTrue($exercise->solution->content->active==1);
+        $result = $this->createExercise();
+
+        $response = $this->actingAs($result['exercise']->chapter->teacher->user)
+            ->put(
+                route('exercises.update', ["exercise" => $result['exercise']->id]),
+                [
+                    "enonce" => [
+                        "active" => 0
+                    ]
+                ]
+            );
+
+        $response
+            ->assertStatus(Response::HTTP_CREATED)
+            ->assertJson($this->decodeResource(new ExerciseResource($result['exercise'])));
     }
-
 }

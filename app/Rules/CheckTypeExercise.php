@@ -26,8 +26,8 @@ class CheckTypeExercise implements Rule
      * @return bool
      */
     public function passes($attribute, $code)
-    {        
-        $referentiel = Referentiel::where("code",$code)->where("type",TypeReferentiel::EXERCISE)->first();
+    {
+        $referentiel = Referentiel::where("code", $code)->where("type", TypeReferentiel::EXERCISE)->first();
         return isset($referentiel);
     }
 

@@ -2,9 +2,7 @@
 
 namespace App\Http\Resources;
 
-use App\Http\Actions\Content\ExtractContent;
 use App\Http\Resources\EnseignementResource;
-use Illuminate\Http\Resources\Json\JsonResource;
 
 class ChapterResource extends EnseignementResource
 {
@@ -16,17 +14,20 @@ class ChapterResource extends EnseignementResource
      */
     public function toArray($request)
     {
-        $enseignement = parent::toArray($request);
-
-        return array_merge($enseignement, [
-            'title' => $this->title,
-            'resume' => $this->resume,
-            'active' => (string) $this->active,
-            'position' => $this->position,
-            'content' => $this->canReadContent()
-                ? $this->content
-                : (new ExtractContent)->execute($this->content),
-            'exercises' => ExerciseResource::collection($this->whenLoaded('exercises'))
-        ]);
+        return array_merge(
+            parent::toArray($request),
+            [
+                'title' => $this->title,
+                'resume' => $this->resume,
+                'position' => $this->position,
+                "public" => (string) $this->is_public,
+                "toc" => (string) $this->toc,
+                'content' => [
+                    "data" => $this->content,
+                    'active' => (string) $this->is_active,
+                ],
+                'exercises' => ExerciseResource::collection($this->whenLoaded('exercises'))
+            ]
+        );
     }
 }

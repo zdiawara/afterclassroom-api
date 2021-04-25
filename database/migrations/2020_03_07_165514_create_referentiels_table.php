@@ -15,11 +15,11 @@ class CreateReferentielsTable extends Migration
     {
         Schema::create('referentiels', function (Blueprint $table) {
             $table->id();
-            $table->string('name',50);
-            $table->string('code',20);
-            $table->string('type',20);
+            $table->string('name', 50);
+            $table->string('code', 20);
+            $table->string('type', 20);
             $table->smallInteger('position');
-            $table->unique(['code','type']);
+            $table->unique(['code', 'type']);
             $table->timestamps();
         });
     }

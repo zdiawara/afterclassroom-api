@@ -30,14 +30,14 @@ $factory->define(User::class, function (Faker $faker) {
     return [
         'firstname' => $faker->firstName,
         'lastname' => $faker->lastName,
-        'username'=>$faker->userName,
+        'username' => $faker->userName,
         'email' => $faker->unique()->safeEmail,
         'email_verified_at' => now(),
         'password' => bcrypt('secret'),
-        "avatar" => UploadedFile::fake()->image("cover.png"),
+        "avatar" => 'test.png', //UploadedFile::fake()->image("cover.png"),
         'gender' => Referentiel::firstOrCreate(
-            ["code" => CodeReferentiel::HOMME,"type" => TypeReferentiel::GENDER],
-            collect(factory(Referentiel::class)->make()->toArray())->except(['code','type'])->all()
+            ["code" => CodeReferentiel::HOMME, "type" => TypeReferentiel::GENDER],
+            collect(factory(Referentiel::class)->make()->toArray())->except(['code', 'type'])->all()
         )->id
     ];
 });

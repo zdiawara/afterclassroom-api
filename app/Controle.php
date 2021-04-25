@@ -24,10 +24,6 @@ class Controle extends Enseignement
         return $this->belongsTo(Referentiel::class);
     }
 
-    /*public function options(){
-        return $this->morphToMany('App\Option', 'enseignementable');
-    }*/
-
     public function setTypeIdAttribute($code)
     {
         if (!is_null($code)) {

@@ -4,9 +4,7 @@ namespace App\Http\Resources;
 
 use App\Http\Actions\ExerciseContent;
 
-use App\Http\Actions\Checker\UserChecker;
 use App\Http\Resources\ReferentielResource;
-use App\Http\Actions\Content\ExtractContent;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class ExerciseResource extends JsonResource
@@ -23,11 +21,13 @@ class ExerciseResource extends JsonResource
             'id' => (string) $this->id,
             'type' => new ReferentielResource($this->whenLoaded('type')),
             'position' => $this->position,
+            'public' => (string) $this->is_public,
             'notions' => $this->notions,
             'prerequis' => $this->prerequis,
-            'updated' => date('d/m/Y', strtotime($this->updated_at)),
+            'updated' => $this->updated_at,
+            'created' => $this->created_at,
         ];
 
-        return array_merge($exercise, (new ExerciseContent)->build($this, $this->chapter));
+        return array_merge($exercise, (new ExerciseContent)->build($this));
     }
 }

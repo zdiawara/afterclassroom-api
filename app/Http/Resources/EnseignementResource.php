@@ -10,10 +10,10 @@ use Illuminate\Http\Resources\Json\JsonResource;
 
 class EnseignementResource extends JsonResource
 {
-
     public function canReadContent()
     {
-        return (new UserChecker)->canReadContent(auth()->userOrFail(), $this);
+        return $this->is_public || (new UserChecker)
+            ->canReadContent(auth()->userOrFail(), $this);
     }
 
     /**
@@ -31,8 +31,8 @@ class EnseignementResource extends JsonResource
             'specialite' => new SpecialiteResource($this->whenLoaded('specialite')),
             'classe' => new ClasseResource($this->whenLoaded('classe')),
             'teacher' => new UserResource($this->whenLoaded('teacher')),
-            'options' => OptionResource::collection($this->whenLoaded('options')),
-            'updated' => date('d/m/Y', strtotime($this->updated_at))
+            'updated' => $this->updated_at,
+            'created' => $this->created_at
         ];
     }
 }

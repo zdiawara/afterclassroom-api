@@ -10,5 +10,6 @@ $factory->define(Referentiel::class, function (Faker $faker) {
         "name" => $faker->word,
         "code" => $faker->unique()->word,
         "type" => $faker->unique()->word,
+        "position" => 0
     ];
 });

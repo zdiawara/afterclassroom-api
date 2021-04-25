@@ -24,7 +24,7 @@ class UserChecker extends Checker
     {
         $user = auth()->userOrFail();
         if ($user->isTeacher()) {
-            return $user->username === $username;
+            return strtolower($user->username) === strtolower($username);
         }
         return false;
     }

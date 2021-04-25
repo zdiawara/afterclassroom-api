@@ -24,11 +24,11 @@ class CustumRequest extends FormRequest
      */
     public function makeRules($rules)
     {
-        if(!is_array($rules)){
+        if (!is_array($rules)) {
             return [];
         }
-        if($this->isMethod('put') || $this->isMethod('patch')){
-            return collect($rules)->filter(function($rule,$key){
+        if ($this->isMethod('put') || $this->isMethod('patch')) {
+            return collect($rules)->filter(function ($rule, $key) {
                 return $this->has($key);
             })->all();
         }

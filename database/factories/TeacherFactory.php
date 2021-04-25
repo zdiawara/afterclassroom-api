@@ -15,32 +15,32 @@ use App\Constants\TypeReferentiel;
 $factory->define(Teacher::class, function (Faker $faker) {
 
     Referentiel::firstOrCreate(
-        ["code" => CodeReferentiel::VALIDATING,"type" => TypeReferentiel::ETAT],
-        collect(factory(Referentiel::class)->make()->toArray())->except(['code','type'])->all()
+        ["code" => CodeReferentiel::VALIDATING, "type" => TypeReferentiel::ETAT],
+        collect(factory(Referentiel::class)->make()->toArray())->except(['code', 'type'])->all()
     );
 
-    factory(Matiere::class,rand(2,3))->create();
+    factory(Matiere::class, rand(2, 3))->create();
+
+    $level = Referentiel::firstOrCreate(
+        ["code" => CodeReferentiel::LYCEE, "type" => TypeReferentiel::LEVEL],
+        collect(factory(Referentiel::class)->make()->toArray())->except(['code', 'type'])->all()
+    );
 
     return [
-        'level' => Referentiel::firstOrCreate(
-            ["code" => CodeReferentiel::LYCEE,"type" => TypeReferentiel::LEVEL],
-            collect(factory(Referentiel::class)->make()->toArray())->except(['code','type'])->all()
-        )->id,
-
-        'matieres' => Matiere::all()->map(function($matiere){
-            return ['id'=>$matiere->id];
+        'matieres' => Matiere::all()->map(function ($matiere) use ($level) {
+            return ['code' => $matiere->code, 'level' => $level->code];
         })->all()
     ];
 });
 
 $factory->afterCreating(Teacher::class, function ($teacher, $faker) {
     $teacher->user()->save(factory(User::class)->make());
-    
+
     $refEtat = Referentiel::firstOrCreate(
-        ["code" => CodeReferentiel::VALIDATED,"type" => TypeReferentiel::ETAT],
-        collect(factory(Referentiel::class)->make()->toArray())->except(['code','type'])->all()
+        ["code" => CodeReferentiel::VALIDATED, "type" => TypeReferentiel::ETAT],
+        collect(factory(Referentiel::class)->make()->toArray())->except(['code', 'type'])->all()
     );
-    
+
     /*factory(Matiere::class,rand(2,3))->create()->each(function($matiere)use($teacher,$refEtat,$faker){
         $specialite = factory(Specialite::class)->make();
         $specialite->matiere_id = $matiere->id;

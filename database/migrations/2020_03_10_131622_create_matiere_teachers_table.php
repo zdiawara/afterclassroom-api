@@ -14,11 +14,12 @@ class CreateMatiereTeachersTable extends Migration
     public function up()
     {
         Schema::create('matiere_teacher', function (Blueprint $table) {
-			$table->id();
+            $table->id();
             $table->unsignedBigInteger('matiere_id');
             $table->unsignedBigInteger('teacher_id');
             $table->unsignedBigInteger('etat_id');
             $table->unsignedBigInteger('level_id');
+            $table->boolean('is_principal')->default(false);
             //$table->string('justificatif')->nullable();
             $table->softDeletes();
             $table->timestamps();

@@ -14,12 +14,14 @@ class CreateClassesTable extends Migration
     public function up()
     {
         Schema::create('classes', function (Blueprint $table) {
-            
+
             $table->id();
-            $table->string('name',50);
-            $table->string('abreviation',10)->unique();
-            $table->string('code',20)->unique();
+            $table->string('name', 50);
+            $table->string('abreviation', 10)->unique();
+            $table->string('code', 20)->unique();
             $table->smallInteger('position');
+            $table->boolean('is_exam_class')->default(false);
+            $table->boolean('has_faq')->default(false);
             $table->unsignedBigInteger('level_id');
             $table->timestamps();
 

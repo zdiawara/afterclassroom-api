@@ -3,7 +3,6 @@
 namespace Tests\Feature\Chapter;
 
 use App\Chapter;
-use App\Teacher;
 use Tests\TestCase;
 use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -16,22 +15,21 @@ class ListChapterTest extends TestCase
     public function a_user_can_list_teacher_chapters()
     {
         $this->withoutExceptionHandling();
-        
-        $teacher = factory(Teacher::class)->create();
-        
+
+        $teacher = $this->createTeacher()['teacher'];
+
         $size = 5;
 
-        factory(Chapter::class,$size)->make()->each(function($chapter) use ($teacher){
+        factory(Chapter::class, $size)->make()->each(function () use ($teacher) {
             $this->createChapter($teacher);
         });
 
         $response = $this->actingAs($teacher->user)->get(route('chapters.index', [
-            'teacher' => $teacher->user->username
+            'teacher' => $teacher->user->username,
+            'matiere' => 'test',
+            'classe' => 'test'
         ]));
 
         $response->assertStatus(Response::HTTP_OK);
-        
-        //$this->assertTrue($response->json()['total']==$size);
     }
-
 }

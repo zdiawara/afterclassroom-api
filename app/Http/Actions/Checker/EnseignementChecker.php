@@ -55,9 +55,9 @@ class EnseignementChecker extends Checker
         return $this->createOrUpdate($model);
     }
 
-    public function checkReadInactive(Model $model, Teacher $teacher)
+    public function checkCanReadInactive(bool $is_active, string $teacher)
     {
-        if ($model->active == 0 && !$this->userChecker->canReadInactive($teacher->user->username)) {
+        if (!$is_active && !$this->userChecker->canReadInactive($teacher)) {
             $this->badRequestException("Cette resource n'est pas accessible pour le moment !");
         }
     }

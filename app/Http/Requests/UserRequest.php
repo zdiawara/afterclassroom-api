@@ -5,8 +5,9 @@ namespace App\Http\Requests;
 use App\Http\Requests\CustumRequest;
 use Illuminate\Foundation\Http\FormRequest;
 
-class UserRequest extends CustumRequest {
-    
+class UserRequest extends CustumRequest
+{
+
     protected $userId;
 
     /**
@@ -20,10 +21,11 @@ class UserRequest extends CustumRequest {
             'firstname' => 'required|max:50|min:2',
             'lastname' => 'required|max:50|min:2',
             //'username' => "required|max:50|min:3|unique:users,username,".$this->userId,
-            'email' => 'required|email|max:50|unique:users,email,'.$this->userId,
+            'email' => 'required|email|max:50|unique:users,email,' . $this->userId,
             'password' => 'required|min:6',
             //'gender' => 'required',
-            'avatar' => 'mimes:png,jpeg,jpg',
+            //'avatar' => 'mimes:png,jpeg,jpg',
+            //'avatar' => 'mimes:png,jpeg,jpg',
         ];
     }
 }

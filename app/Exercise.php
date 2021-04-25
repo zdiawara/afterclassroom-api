@@ -11,20 +11,23 @@ use Illuminate\Database\Eloquent\Model;
 class Exercise extends Model
 {
     protected $guarded = [];
-    
+
     //
-    public function type(){
+    public function type()
+    {
         return $this->belongsTo(Referentiel::class);
     }
 
     //
-    public function chapter(){
+    public function chapter()
+    {
         return $this->belongsTo(Chapter::class);
     }
 
-    public function setTypeIdAttribute($code){
-        if(!is_null($code)){
-            $this->attributes['type_id'] = Referentiel::where("code",$code)->where("type",TypeReferentiel::EXERCISE)->firstOrFail()->id;
+    public function setTypeIdAttribute($code)
+    {
+        if (!is_null($code)) {
+            $this->attributes['type_id'] = Referentiel::where("code", $code)->where("type", TypeReferentiel::EXERCISE)->firstOrFail()->id;
         }
     }
 }

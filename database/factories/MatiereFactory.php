@@ -10,5 +10,6 @@ $factory->define(Matiere::class, function (Faker $faker) {
         "name" => $faker->word,
         "abreviation" => $faker->word,
         "code" => $faker->unique()->word,
+        "position" => 0
     ];
 });

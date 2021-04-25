@@ -5,8 +5,6 @@ namespace App\Http\Requests;
 use App\Rules\CheckChapter;
 use App\Rules\CheckTypeExercise;
 use App\Http\Requests\CustumRequest;
-use App\Http\Requests\EnseignementRules;
-use Illuminate\Foundation\Http\FormRequest;
 
 class ExerciseRequest extends CustumRequest
 {
@@ -22,11 +20,10 @@ class ExerciseRequest extends CustumRequest
             'type' => ['required', new CheckTypeExercise],
             'chapter' => ['required', new CheckChapter],
             'position' => 'integer',
+            'public' => 'boolean',
             'enonce.active' => 'boolean',
             'correction.active' => 'boolean',
         ];
-        return $this->makeRules(array_merge(
-            $rules
-        ));
+        return $this->makeRules(array_merge($rules));
     }
 }

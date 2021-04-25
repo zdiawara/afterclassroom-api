@@ -15,9 +15,7 @@ class CreateTeachersTable extends Migration
     {
         Schema::create('teachers', function (Blueprint $table) {
             $table->id();
-            //$table->unsignedBigInteger('level_id');
             $table->timestamps();
-            //$table->foreign('level_id')->references('id')->on('referentiels');
         });
     }
 

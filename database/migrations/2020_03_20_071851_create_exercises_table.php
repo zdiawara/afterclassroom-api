@@ -18,14 +18,14 @@ class CreateExercisesTable extends Migration
             $table->smallInteger('position')->default(1);
             $table->string('notions')->nullable();
             $table->string('prerequis')->nullable();
-            $table->boolean('active_enonce')->default(false);;
+            $table->boolean('is_public')->default(true);
             $table->longText('enonce')->nullable();
-            $table->boolean('active_correction')->default(false);;
+            $table->boolean('is_enonce_active')->default(false);;
             $table->longText('correction')->nullable();
+            $table->boolean('is_correction_active')->default(false);;
             $table->unsignedBigInteger('type_id');
             $table->unsignedBigInteger('chapter_id');
             $table->timestamps();
-
 
             $table->foreign('chapter_id')->references('id')->on('chapters');
             $table->foreign('type_id')->references('id')->on('referentiels');

@@ -19,7 +19,9 @@ class CreateChaptersTable extends Migration
             $table->smallInteger('position')->default(1);
             $table->string('resume', 255)->nullable();
             $table->longText('content')->nullable();
-            $table->boolean('active')->default(false);
+            $table->longText('toc')->nullable();
+            $table->boolean('is_public')->default(true);
+            $table->boolean('is_active')->default(false);
             $table->unsignedBigInteger('teacher_id');
             $table->unsignedBigInteger('classe_id');
             $table->unsignedBigInteger('specialite_id')->nullable();

@@ -1,9 +1,7 @@
 <?php
 
 use App\User;
-use App\Admin;
 use App\Classe;
-use App\Option;
 use App\Matiere;
 use App\Student;
 use App\Teacher;
@@ -20,7 +18,9 @@ use App\Country;
 use Illuminate\Database\Seeder;
 use App\Constants\CodeReferentiel;
 use App\Constants\TypeReferentiel;
+use App\Http\Actions\Content\DocumentPlan;
 use App\Http\Actions\User\ManageIdentify;
+use App\MatiereTeacher;
 
 class DatabaseSeeder extends Seeder
 {
@@ -62,7 +62,9 @@ class DatabaseSeeder extends Seeder
 
         // Creation d'un teacher
         $t1 = $this->createTeacher('Yao', 'Lovie', 'lovie.yao@test.com', 'lovie', ['maths', 'pc', 'svt'], $lycee);
+        $this->setIsPrincipal($t1, 'maths');
         $t2 = $this->createTeacher('Drabo', 'Souley', 'souley.drabo@test.com', 'souley', ['pc'], $lycee);
+        $this->setIsPrincipal($t2, 'pc');
         $this->createTeacher('Zerbo', 'Alassane', 'zerbo.alassane@test.com', 'alassane', ['maths'], $lycee);
         $t4 = $this->createTeacher('Joseph', 'Ibara', 'ibara.joseph@test.com', 'ibara', ['pc'], $lycee);
         $this->createTeacher('Sebastian', 'Mampassi', 'mampassi.sebastian@test.com', 'mampassi', ['svt'], $lycee);
@@ -77,11 +79,20 @@ class DatabaseSeeder extends Seeder
         $this->createStudent('Jean', 'Somé', 'some.jean@test.com', 'jean', 'sixieme');
 
         $this->createStudentTeacher($s1, $t1, 'maths', 'terminale_d');
-        $this->createStudentTeacher($s1, $t2, 'maths', 'terminale_d');
         $this->createStudentTeacher($s1, $t4, 'pc', 'terminale_d');
 
-        // $this->createChapters();
+
+        $this->createChapters();
         // $this->createControles();
+    }
+
+    private function setIsPrincipal(Teacher $teacher, string $matiere)
+    {
+        MatiereTeacher::where('teacher_id', $teacher->id)
+            ->whereHas('matiere', function ($q) use ($matiere) {
+                $q->where('code', $matiere);
+            })
+            ->update(['is_principal' => true]);
     }
 
     private function generateClasseMatieres()
@@ -120,7 +131,7 @@ class DatabaseSeeder extends Seeder
                         'matiere_id' => $matiere,
                         'country_id' => $country
                     ]);
-					$classeMatiere->save();
+                    $classeMatiere->save();
                 });
             });
         });
@@ -130,27 +141,30 @@ class DatabaseSeeder extends Seeder
     {
 
         Teacher::all()->each(function ($teacher) {
-            factory('App\Chapter', rand(50, 60))->make()->each(function ($chapter) use ($teacher) {
+            factory('App\Chapter', rand(100, 200))->make()->each(function ($chapter) use ($teacher) {
                 $chapter->teacher_id = $teacher->user->username;
-                $chapter->classe_id = Classe::where('level_id', $teacher->level->id)->get()->random()->code;
                 $chapter->matiere_id = $teacher->matieres->random()->code;
+                $chapter->toc = (new DocumentPlan())->execute($chapter->content);
+                $levelId = MatiereTeacher::where('matiere_id', $chapter->matiere_id)
+                    ->where('teacher_id',  $chapter->teacher_id)
+                    ->first()
+                    ->level_id;
+                $chapter->classe_id = Classe::where('level_id', $levelId)->get()->random()->code;
                 $chapter->specialite_id = $this->getSpecialite($chapter->matiere_id);
 
                 $chapter->save();
 
 
-                factory(Exercise::class, rand(0, 10))->make()->each(function ($exercise) use ($chapter) {
+                factory(Exercise::class, rand(5, 10))->make()->each(function ($exercise) use ($chapter) {
                     $exercise->chapter_id = $chapter->id;
-                    $exercise->active_enonce = $exercise['enonce']['active'];
+                    $exercise->is_enonce_active = $exercise['enonce']['active'];
                     $exercise->enonce = $exercise['enonce']['data'];
-                    $exercise->active_correction = $exercise['correction']['active'];
+                    $exercise->is_correction_active = $exercise['correction']['active'];
                     $exercise->correction = $exercise['correction']['data'];
                     $exercise->type_id = Referentiel::where('type', TypeReferentiel::EXERCISE)->get()->random()->code;
 
                     $exercise->save();
                 });
-
-                //$chapter->options()->attach($this->getOptions($chapter->classe_id));
             });
         });
     }
@@ -181,8 +195,6 @@ class DatabaseSeeder extends Seeder
                 }
 
                 $newControle->save();
-
-                //$newControle->options()->attach($this->getOptions($newControle->classe_id));
             });
         });
     }
@@ -196,24 +208,13 @@ class DatabaseSeeder extends Seeder
         return null;
     }
 
-    private function getOptions($classeID)
-    {
-        $options = Option::where('classe_id', $classeID)->get();
-        if ($options->count() != 0) {
-            return $options->random(1, $options->count())->map(function ($e) {
-                return $e->id;
-            });
-        }
-        return [];
-    }
-
     private function createStudentTeacher($student, $teacher, $matiere, $classe)
     {
         $st = new StudentTeacher();
         $st->matiere_id = Matiere::where('code', $matiere)->first()->id;
         $st->classe_id = Classe::where('code', $classe)->first()->id;
         $st->student_id = $student->userable->id;
-        $st->teacher_id = $teacher->userable->id;
+        $st->teacher_id = $teacher->id;
         $st->college_year_id = CollegeYear::first()->id;
         $st->save();
     }
@@ -294,6 +295,12 @@ class DatabaseSeeder extends Seeder
         Classe::create($this->generateClasse('Terminale A', 'Tle A', 'terminale_a', 7, $lycee));
         Classe::create($this->generateClasse('Terminale C', 'Tle C', 'terminale_c', 7, $lycee));
         Classe::create($this->generateClasse('Terminale D', 'Tle D', 'terminale_d', 7, $lycee));
+
+        Classe::whereIn('code', ["troisieme", 'terminale_a', 'terminale_c', 'terminale_d'])
+            ->update([
+                'has_faq' =>  true,
+                'is_exam_class' => true
+            ]);
     }
 
 
@@ -383,14 +390,13 @@ class DatabaseSeeder extends Seeder
             ]);
         });
 
-        return $user;
+        return $teacher;
     }
 
     private function createStudent($firstname, $lastname, $email, $username, $classe)
     {
         $student = new Student();
         $student->classe_id = $classe;
-        //$student->option_id = Option::where('classe_id',$student->classe_id)->first()->id;
         $student->save();
 
         $user = new User([

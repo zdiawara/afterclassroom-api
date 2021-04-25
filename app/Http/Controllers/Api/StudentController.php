@@ -45,9 +45,6 @@ class StudentController extends Controller
         if ($request->has('classe')) {
             $fields['classe_id'] = $request->get('classe');
         }
-        if ($request->has('option')) {
-            $fields['option_id'] = $request->get('option');
-        }
         return $fields;
     }
 

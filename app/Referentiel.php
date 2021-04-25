@@ -12,6 +12,6 @@ class Referentiel extends Model
      * @var array
      */
     protected $fillable = [
-        'name', 'code', 'type',
+        'name', 'code', 'type', 'position'
     ];
 }

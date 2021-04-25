@@ -4,23 +4,13 @@ namespace App\Http\Controllers\Api;
 
 use App\Matiere;
 use App\Controle;
-use App\Exercise;
-use App\Solution;
-use App\Constants\Code;
 use App\Http\Actions\Queries;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\ControleRequest;
-use App\Http\Requests\ExerciseRequest;
-use App\Http\Actions\Option\SyncOption;
-use App\Http\Resources\ContentResource;
 use App\Http\Resources\ControleResource;
-use App\Http\Resources\ExerciseResource;
 use App\Http\Actions\Checker\UserChecker;
 use App\Http\Resources\ControleCollection;
-use App\Http\Actions\Content\ManageContent;
-use App\Http\Actions\Exercise\CreateExercise;
 use Symfony\Component\HttpFoundation\Request;
-use App\Http\Actions\Exercise\ControleExercise;
 use App\Http\Actions\Checker\EnseignementChecker;
 use App\Http\Actions\Checker\TeacherMatiereChecker;
 
@@ -98,7 +88,7 @@ class ControleController extends Controller
         //
         $fields = $this->extractEnseignementFields($request);
 
-        $controle = new Controle(array_merge($this->extractControleFields($request), collect($fields)->except('options')->all()));
+        $controle = new Controle(array_merge($this->extractControleFields($request), $fields));
 
         // Verifie que l'ut peut crée le controle
         $this->enseignementChecker->canCreate($controle);
@@ -122,7 +112,7 @@ class ControleController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(ControleRequest $request, Controle $controle, SyncOption $syncOption)
+    public function update(ControleRequest $request, Controle $controle)
     {
         // Verifie que l'ut connecté peut créer modifier le controle
         $this->enseignementChecker->canUpdate($controle);
@@ -138,10 +128,7 @@ class ControleController extends Controller
         // verifie que le teacher peut enseigner la matiere
         $this->teacherMatiereChecker->canTeach($controle->teacher, $controle->matiere, !(isset($fields['active_correction']) || isset($fields['active_enonce'])));
 
-        $controle->update(collect($fields)->except('options')->all());
-
-        // Sync les options
-        //$syncOption->execute($controle, $fields);
+        $controle->update($fields);
 
         $this->loadDependences($controle);
 

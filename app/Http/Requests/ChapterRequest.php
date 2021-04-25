@@ -4,7 +4,6 @@ namespace App\Http\Requests;
 
 use App\Http\Requests\CustumRequest;
 use App\Http\Requests\EnseignementRules;
-use Illuminate\Foundation\Http\FormRequest;
 
 class ChapterRequest extends CustumRequest
 {

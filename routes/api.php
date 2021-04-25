@@ -42,18 +42,11 @@ Route::apiResource('teachers.matieres', "Api\TeacherMatiereController");
 Route::apiResource('students', "Api\StudentController");
 Route::apiResource('students.teachers', "Api\StudentTeacherController");
 
-
-/*Route::group(['prefix' => 'chapters'], function ($router) {
-    Route::get('/{chapter}/content', 'ChapterController@showContent')->name('chapters.content');
-    Route::post('/{chapter}/exercises', 'ChapterController@storeExercise')->name('chapters.exercises.store');
-    Route::get('/{chapter}/exercises', 'ChapterController@showExercises')->name('chapters.exercises.index');
-});*/
-
 // Chapter
 Route::apiResource('chapters', "ChapterController");
 Route::group(['prefix' => 'chapters'], function ($router) {
-    Route::get('/{chapter}/exercises', 'ChapterController@showExercises')->name('chapter.showExercises');
-    Route::get('/{chapter}/questions', 'ChapterController@showQuestions')->name('chapter.showQuestions');
+    Route::get('/{chapter}/exercises', 'ChapterController@showExercises')->name('chapters.showExercises');
+    Route::get('/{chapter}/questions', 'ChapterController@showQuestions')->name('chapters.showQuestions');
 });
 
 // Exercise
@@ -84,7 +77,6 @@ Route::group(['prefix' => 'files'], function ($router) {
 Route::group(['prefix' => 'mails'], function ($router) {
     Route::post('/', 'Api\MailController@send')->name('mails.send');
 });
-
 
 Route::group(['prefix' => 'events'], function ($router) {
     Route::get('/', 'Api\EventController@readEvents')->name('events.read');
