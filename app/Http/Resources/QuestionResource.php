@@ -17,10 +17,11 @@ class QuestionResource extends JsonResource
         return [
             'id' => (string) $this->id,
             'title' => $this->title,
-            'active' => (string) $this->active,
+            'active' => (string) $this->is_active,
             'content' => $this->content,
-            'chapter' => new ChapterResource($this->whenLoaded('chapter')),
-            'updated' => date('d/m/Y', strtotime($this->updated_at)),
+            'chapter' => new NotionResource($this->whenLoaded('chapter')),
+            'updated' => $this->updated_at,
+            'created' => $this->created_at
         ];
     }
 }

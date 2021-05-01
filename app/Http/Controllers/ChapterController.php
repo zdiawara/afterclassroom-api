@@ -79,7 +79,7 @@ class ChapterController extends Controller
      */
     public function showQuestions(Chapter $chapter)
     {
-        $query = $chapter->questions()->orderBy('position', 'asc');
+        $query = $chapter->questions(); //->orderBy('position', 'asc');
 
         // Le professeur peut lire les exercices qui ne sont pas activés
         if (!$this->userChecker->canReadInactive($chapter->teacher->user->username)) {

@@ -6,6 +6,7 @@ use App\Matiere;
 use App\Student;
 use App\Teacher;
 use App\Category;
+use App\Chapter;
 use App\Controle;
 use App\Exercise;
 use App\Identify;
@@ -21,6 +22,7 @@ use App\Constants\TypeReferentiel;
 use App\Http\Actions\Content\DocumentPlan;
 use App\Http\Actions\User\ManageIdentify;
 use App\MatiereTeacher;
+use App\Question;
 
 class DatabaseSeeder extends Seeder
 {
@@ -83,6 +85,7 @@ class DatabaseSeeder extends Seeder
 
 
         $this->createChapters();
+        $this->createQuestions();
         // $this->createControles();
     }
 
@@ -167,6 +170,27 @@ class DatabaseSeeder extends Seeder
                 });
             });
         });
+    }
+
+    private function createQuestions()
+    {
+        MatiereTeacher::where('is_principal', '1')
+            ->get()
+            ->each(function ($matiereTeacher) {
+                Chapter::where('teacher_id', $matiereTeacher->teacher_id)
+                    ->where('matiere_id', $matiereTeacher->matiere_id)
+                    ->whereHas('classe', function ($q) {
+                        $q->where('has_faq', '1');
+                    })->get()
+                    ->each(function ($chapter) {
+                        factory(Question::class, rand(5, 15))
+                            ->make()
+                            ->each(function ($question) use ($chapter) {
+                                $question->chapter_id = $chapter->id;
+                                $question->save();
+                            });
+                    });
+            });
     }
 
     private function createControles()

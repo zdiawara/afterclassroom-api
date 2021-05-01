@@ -7,6 +7,9 @@ use App\Http\Requests\QuestionRequest;
 use App\Http\Resources\QuestionResource;
 use App\Http\Actions\Checker\EnseignementChecker;
 use App\Http\Actions\Checker\TeacherMatiereChecker;
+use App\Http\Actions\Question\SearchQuestion;
+use App\Http\Requests\ListQuestionRequest;
+use App\Http\Resources\NotionResource;
 use App\Question;
 
 class QuestionController extends Controller
@@ -22,10 +25,22 @@ class QuestionController extends Controller
         $this->teacherMatiereChecker = $teacherMatiereChecker;
     }
 
+    public function index(ListQuestionRequest $request, SearchQuestion $searchQuestion)
+    {
+        $_params = $request->only(['classe', 'matiere', 'search', 'page']);
+
+        if ($request->has('notions')) {
+            return NotionResource::collection($searchQuestion->byChapters($_params));
+        }
+        return QuestionResource::collection($searchQuestion->byTeacher(array_merge(
+            $_params,
+            $request->only(['chapterId'])
+        )));
+    }
 
     public function show(Question $question)
     {
-        $this->enseignementChecker->checkReadInactive($question, $question->chapter->teacher);
+        //$this->enseignementChecker->checkReadInactive($question, $question->chapter->teacher);
 
         $question->load(['chapter']);
 
