@@ -13,25 +13,34 @@ class StudentTeacher extends Model
 {
     //
     use SoftDeletes;
-    
+
     protected $guarded = [];
 
     protected $table = 'student_teacher';
 
 
-    public function matiere(){
+    public function matiere()
+    {
         return $this->belongsTo(Matiere::class);
     }
 
-    public function classe(){
+    public function classe()
+    {
         return $this->belongsTo(Classe::class);
     }
-    
-    public function teacher(){
+
+    public function teacher()
+    {
         return $this->belongsTo(Teacher::class);
     }
 
-    public function collegeYear(){
+    public function enseignement()
+    {
+        return $this->belongsTo(Referentiel::class);
+    }
+
+    public function collegeYear()
+    {
         return $this->belongsTo(CollegeYear::class);
     }
 }

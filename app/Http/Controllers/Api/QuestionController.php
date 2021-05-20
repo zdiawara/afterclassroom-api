@@ -7,6 +7,7 @@ use App\Http\Requests\QuestionRequest;
 use App\Http\Resources\QuestionResource;
 use App\Http\Actions\Checker\EnseignementChecker;
 use App\Http\Actions\Checker\TeacherMatiereChecker;
+use App\Http\Actions\MatiereTeacher\FindMatiereTeacher;
 use App\Http\Actions\Question\SearchQuestion;
 use App\Http\Requests\ListQuestionRequest;
 use App\Http\Resources\NotionResource;
@@ -25,25 +26,19 @@ class QuestionController extends Controller
         $this->teacherMatiereChecker = $teacherMatiereChecker;
     }
 
-    public function index(ListQuestionRequest $request, SearchQuestion $searchQuestion)
+    public function index(ListQuestionRequest $request, SearchQuestion $searchQuestion, FindMatiereTeacher $findMatiereTeacher)
     {
-        $_params = $request->only(['classe', 'matiere', 'search', 'page']);
-
-        if ($request->has('notions')) {
-            return NotionResource::collection($searchQuestion->byChapters($_params));
-        }
-        return QuestionResource::collection($searchQuestion->byTeacher(array_merge(
-            $_params,
-            $request->only(['chapterId'])
-        )));
+        $params = $request->only(['classe', 'matiere']);
+        $teacher = $findMatiereTeacher->findPrincipalTeacher($params['matiere'], $params['classe']);
+        return NotionResource::collection(isset($teacher) ? $searchQuestion->byChapters(
+            $teacher->user->username,
+            $params
+        ) : []);
     }
 
     public function show(Question $question)
     {
-        //$this->enseignementChecker->checkReadInactive($question, $question->chapter->teacher);
-
         $question->load(['chapter']);
-
         return new QuestionResource($question);
     }
 

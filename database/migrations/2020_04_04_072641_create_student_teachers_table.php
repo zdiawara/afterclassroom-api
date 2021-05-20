@@ -19,9 +19,11 @@ class CreateStudentTeachersTable extends Migration
             $table->unsignedBigInteger('teacher_id');
             $table->unsignedBigInteger('classe_id');
             $table->unsignedBigInteger('matiere_id');
+            $table->unsignedBigInteger('enseignement_id'); // enseignement | faq | exam_subject
             $table->unsignedBigInteger('college_year_id');
             $table->timestamps();
             $table->softDeletes();
+            $table->foreign('enseignement_id')->references('id')->on('referentiels');
             $table->foreign('teacher_id')->references('id')->on('teachers');
             $table->foreign('student_id')->references('id')->on('students');
             $table->foreign('classe_id')->references('id')->on('classes');

@@ -3,9 +3,10 @@
 namespace App\Http\Actions\Chapter;
 
 use App\Chapter;
+use App\Http\Actions\Content\DataAccess;
+use App\Http\Actions\Content\ReadContent;
 use App\Http\Actions\Checker\EnseignementChecker;
 use App\Http\Actions\Checker\TeacherMatiereChecker;
-use App\Http\Actions\Content\ReadContent;
 
 class ShowChapter
 {
@@ -13,12 +14,14 @@ class ShowChapter
     private EnseignementChecker $enseignementChecker;
 
     private ReadContent $readContent;
+    private DataAccess $dataAccess;
 
-    public function __construct(ReadContent $readContent, EnseignementChecker $enseignementChecker, TeacherMatiereChecker $teacherMatiereChecker)
+    public function __construct(DataAccess $dataAccess, ReadContent $readContent, EnseignementChecker $enseignementChecker, TeacherMatiereChecker $teacherMatiereChecker)
     {
         $this->readContent = $readContent;
         $this->enseignementChecker = $enseignementChecker;
         $this->teacherMatiereChecker = $teacherMatiereChecker;
+        $this->dataAccess = $dataAccess;
     }
 
 
@@ -31,7 +34,7 @@ class ShowChapter
             "matiere" => $chapter->matiere->code,
             "classe" => $chapter->classe->code,
         ];
-        $canReadContent = $this->readContent->canReadByCode($teacher, $params);
+        $canReadContent = $this->dataAccess->canReadContent($teacher, $params);
         return $this->readContent->byChapter($chapter, $canReadContent);
     }
 }

@@ -71,7 +71,7 @@ class ControleController extends Controller
             $query = $query->where('active_enonce', 1);
         }
 
-        $result = $queries->buildQuery($query, $request);
+        $result = []; //$queries->buildQuery($query, $request);
 
         //return new ControleCollection($result['query']->with(['type','teacher','subject'])->paginate(9,['*'], 'page', $result['page']));
         return new ControleCollection($result['query']->with(['type', 'trimestre', 'subject'])->get());

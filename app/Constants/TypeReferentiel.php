@@ -16,4 +16,5 @@ class TypeReferentiel
     const GENDER = "gender";
     const TRIMESTRE = "trimestre";
     const EXAMEN = "examen";
+    const ENSEIGNEMENT = "enseignement";
 }

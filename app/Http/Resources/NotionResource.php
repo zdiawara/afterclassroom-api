@@ -2,9 +2,7 @@
 
 namespace App\Http\Resources;
 
-use Illuminate\Http\Resources\Json\JsonResource;
-
-class NotionResource extends JsonResource
+class NotionResource extends EnseignementResource
 {
     /**
      * Transform the resource into an array.
@@ -14,9 +12,12 @@ class NotionResource extends JsonResource
      */
     public function toArray($request)
     {
-        return [
-            'id' => (string) $this->id,
-            'title' => $this->title
-        ];
+        return array_merge(
+            parent::toArray($request),
+            [
+                'title' => $this->title,
+                'questionsCount' => $this->questions_count
+            ]
+        );
     }
 }

@@ -3,16 +3,9 @@
 namespace App\Http\Controllers\Api;
 
 use App\Classe;
-use App\Matiere;
-use App\CollegeYear;
 use App\MatiereTeacher;
-use App\StudentTeacher;
-use App\ClasseMatiere;
-use App\Constants\CodeReferentiel;
 use App\Http\Actions\Classe\ListClasseMatiere;
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Auth;
-use App\Http\Actions\User\UserDetail;
 use App\Http\Resources\StudentResource;
 use App\Http\Resources\TeacherResource;
 use Symfony\Component\HttpFoundation\Response;

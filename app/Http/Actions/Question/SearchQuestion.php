@@ -5,42 +5,31 @@ namespace App\Http\Actions\Question;
 use App\Chapter;
 use App\Question;
 use Illuminate\Support\Facades\DB;
-use App\Http\Actions\MatiereTeacher\FindMatiereTeacher;
+use App\Http\Actions\Checker\UserChecker;
 
 class SearchQuestion
 {
 
-    private FindMatiereTeacher $findMatiereTeacher;
+    private UserChecker $userChecker;
 
-    public function __construct(FindMatiereTeacher $findMatiereTeacher)
+    public function __construct(UserChecker $userChecker)
     {
-        $this->findMatiereTeacher = $findMatiereTeacher;
+        $this->userChecker = $userChecker;
     }
 
-    public function byTeacher(array $params = [])
+    public function byTeacher(string $teacher, array $params = [])
     {
-        $teacher = $this->findMatiereTeacher->findPrincipalTeacher($params['matiere'], $params['classe']);
 
-        if (!isset($teacher)) {
-            return [];
-        }
-
-        $username = $teacher->user->username;
-
-        $query = Question::whereHas('chapter', function ($q) use ($username, $params) {
+        $query = Question::whereHas('chapter', function ($q) use ($teacher, $params) {
 
             $q->whereHas('matiere', function ($queryChapter)  use ($params) {
-                if (!isset($params['chapterId'])) {
-                    $queryChapter->where('code', $params['matiere']);
-                }
+                $queryChapter->where('code', $params['matiere']);
             })->whereHas('classe', function ($queryChapter)  use ($params) {
-                if (!isset($params['chapterId'])) {
-                    $queryChapter->where('code', $params['classe']);
-                }
-            })->whereHas('teacher.user', function ($queryChapter) use ($username) {
+                $queryChapter->where('code', $params['classe']);
+            })->whereHas('teacher.user', function ($queryChapter) use ($teacher) {
                 $queryChapter->where(
                     DB::raw('lower(users.username)'),
-                    strtolower($username)
+                    strtolower($teacher)
                 );
             });
         });
@@ -49,11 +38,6 @@ class SearchQuestion
             $query = $query->where(DB::raw('lower(title)'), 'like', '%' . $params['search'] . '%');
         }
 
-        if (isset($params['chapterId'])) {
-            $query = $query->where('chapter_id', $params['chapterId']);
-        }
-
-
         $questions = $query->with('chapter')
             ->orderBy('title', 'asc')
             ->simplePaginate(10, ['*'], 'page', isset($params['page']) ?  $params['page'] : 0);
@@ -61,19 +45,28 @@ class SearchQuestion
         return $questions;
     }
 
-    public function byChapters(array $params = [])
+    public function byChapters(string $teacher, array $params = [])
     {
-        $teacher = $this->findMatiereTeacher->findPrincipalTeacher($params['matiere'], $params['classe']);
-        if (!isset($teacher)) {
-            return [];
-        }
-        $chapters = Chapter::whereHas('matiere', function ($queryChapter)  use ($params) {
+
+        $canReadInactive = $this->userChecker->canReadInactive($teacher);
+
+        $query = Chapter::whereHas('matiere', function ($queryChapter)  use ($params) {
             $queryChapter->where('code', $params['matiere']);
         })->whereHas('classe', function ($queryChapter)  use ($params) {
             $queryChapter->where('code', $params['classe']);
         })->whereHas('teacher.user', function ($queryChapter) use ($teacher) {
-            $queryChapter->where(DB::raw('lower(users.username)'), strtolower($teacher->user->username));
-        })->get();
-        return $chapters;
+            $queryChapter->where(DB::raw('lower(users.username)'), strtolower($teacher));
+        })->withCount(['questions' => function ($query) use ($canReadInactive) {
+            if (!$canReadInactive) {
+                $query->where('is_active', 1);
+            }
+        }])
+            ->with(['classe', 'matiere', 'specialite']);
+
+        if (!$canReadInactive) {
+            $query = $query->where('is_active', 1);
+        }
+
+        return $query->get();
     }
 }

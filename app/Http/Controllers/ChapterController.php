@@ -7,6 +7,7 @@ use App\Chapter;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\ChapterRequest;
 use App\Http\Resources\ChapterResource;
+use App\Http\Resources\TeacherResource;
 use App\Http\Actions\Chapter\ShowChapter;
 use App\Http\Actions\Checker\UserChecker;
 use App\Http\Requests\ListChapterRequest;
@@ -16,6 +17,9 @@ use App\Http\Resources\QuestionCollection;
 use App\Http\Actions\Chapter\ManageChapter;
 use App\Http\Actions\Chapter\SearchChapter;
 use App\Http\Actions\Exercise\ListExercise;
+use App\Http\Actions\Question\ListQuestion;
+use App\Http\Actions\Teacher\FindTeacher;
+use App\Teacher;
 
 class ChapterController extends Controller
 {
@@ -28,13 +32,14 @@ class ChapterController extends Controller
         $this->userChecker = $userChecker;
     }
 
-    public function index(ListChapterRequest $request, SearchChapter $searchChapter)
+    public function index(ListChapterRequest $request, SearchChapter $searchChapter, FindTeacher $findTeacher)
     {
-        $teacher = $request->get('teacher');
+        $username = $request->get('teacher');
+        $teacher = $findTeacher->byUsername($username);
         $params = $request->only(['classe', 'specialite', 'matiere']);
-        return new ChapterCollection(
-            $searchChapter->byTeacher($teacher, $params)
-        );
+        return (new ChapterCollection(
+            $searchChapter->byTeacher($request->get('teacher'), $params)
+        ))->additional(['teacher' => new TeacherResource($teacher)]);
     }
 
     public function show(Chapter $chapter, ShowChapter $showChapter)
@@ -77,16 +82,9 @@ class ChapterController extends Controller
     /**
      * Affiche toutes les questions d'un chapitre
      */
-    public function showQuestions(Chapter $chapter)
+    public function showQuestions(Chapter $chapter, ListQuestion $listQuestion)
     {
-        $query = $chapter->questions(); //->orderBy('position', 'asc');
-
-        // Le professeur peut lire les exercices qui ne sont pas activés
-        if (!$this->userChecker->canReadInactive($chapter->teacher->user->username)) {
-            $query = $query->where('is_active', 1);
-        }
-
-        return new QuestionCollection($query->get());
+        return new QuestionCollection($listQuestion->byChapter($chapter));
     }
 
     // charge les dependences liées au professeur

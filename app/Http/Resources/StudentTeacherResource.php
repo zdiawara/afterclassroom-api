@@ -8,19 +8,22 @@ use App\Http\Resources\ReferentielResource;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 
-class StudentTeacherResource extends JsonResource{
+class StudentTeacherResource extends JsonResource
+{
     /**
      * Transform the resource into an array.
      *
      * @param  \Illuminate\Http\Request  $request
      * @return array
      */
-    public function toArray($request){
+    public function toArray($request)
+    {
         return [
             'matiere' => new MatiereResource($this->whenLoaded('matiere')),
             'classe' => new ClasseResource($this->whenLoaded('classe')),
             'collegeYear' => new CollegeYearResource($this->whenLoaded('collegeYear')),
-            'teacher' => new TeacherResource($this->whenLoaded('teacher'))
+            'teacher' => new TeacherResource($this->whenLoaded('teacher')),
+            'enseignement' => new ReferentielResource($this->whenLoaded('enseignement'))
         ];
     }
 }

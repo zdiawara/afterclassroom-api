@@ -10,7 +10,7 @@ $factory->define(Question::class, function (Faker $faker) {
 
     return [
         'title' => $faker->text(rand(30, 50)),
-        'content' => Generate::genContent($faker),
+        'content' => Generate::genQuestion($faker),
         'is_active' => rand(0, 1),
         'is_public' => rand(0, 1),
     ];

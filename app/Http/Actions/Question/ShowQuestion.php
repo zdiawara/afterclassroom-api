@@ -31,7 +31,7 @@ class ShowChapter
             "matiere" => $chapter->matiere->code,
             "classe" => $chapter->classe->code,
         ];
-        $canReadContent = $this->readContent->canReadByCode($teacher, $params);
+        $canReadContent = false;
         return $this->readContent->byChapter($chapter, $canReadContent);
     }
 }

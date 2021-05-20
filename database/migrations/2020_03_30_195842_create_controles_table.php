@@ -18,9 +18,9 @@ class CreateControlesTable extends Migration
             $table->smallInteger('position')->default(1);
             $table->year('year')->nullable();
             $table->boolean('is_public')->default(true);
-            $table->longText('enonce_content')->nullable();
+            $table->longText('enonce')->nullable();
             $table->boolean('is_enonce_active')->default(false);;
-            $table->longText('correction_content')->nullable();
+            $table->longText('correction')->nullable();
             $table->boolean('is_correction_active')->default(false);;
 
             $table->unsignedBigInteger('teacher_id');
@@ -30,12 +30,12 @@ class CreateControlesTable extends Migration
 
             $table->unsignedBigInteger('type_id');
             $table->unsignedBigInteger('trimestre_id')->nullable();;
-            $table->unsignedBigInteger('subject_id')->nullable();;
+            //$table->unsignedBigInteger('subject_id')->nullable();;
 
 
             $table->timestamps();
 
-            $table->foreign('subject_id')->references('id')->on('referentiels');
+            //$table->foreign('subject_id')->references('id')->on('referentiels');
             $table->foreign('type_id')->references('id')->on('referentiels');
             $table->foreign('trimestre_id')->references('id')->on('referentiels');
             $table->foreign('teacher_id')->references('id')->on('teachers');
