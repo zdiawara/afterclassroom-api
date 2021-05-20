@@ -6,6 +6,7 @@ use App\Chapter;
 use App\Http\Actions\Queries;
 use Illuminate\Support\Facades\DB;
 use App\Http\Actions\Checker\UserChecker;
+use App\Http\Actions\Content\DataAccess;
 use App\Http\Actions\Content\ReadContent;
 
 class SearchChapter
@@ -13,11 +14,13 @@ class SearchChapter
 
     private UserChecker $userChecker;
     private ReadContent $readContent;
+    private DataAccess $dataAccess;
 
-    public function __construct(UserChecker $userChecker, ReadContent $readContent)
+    public function __construct(UserChecker $userChecker, ReadContent $readContent, DataAccess $dataAccess)
     {
         $this->userChecker = $userChecker;
         $this->readContent = $readContent;
+        $this->dataAccess = $dataAccess;
     }
 
     public function byTeacher(string $teacher, array $params = [])
@@ -36,7 +39,7 @@ class SearchChapter
             ->orderByPosition()
             ->get();
 
-        $canReadContent = $this->readContent->canReadByCode($teacher, $params);
+        $canReadContent = $this->dataAccess->canReadContent($teacher, $params);
         return $chapters->map(fn ($chapter) => $this->readContent->byChapter($chapter, $canReadContent));
     }
 }

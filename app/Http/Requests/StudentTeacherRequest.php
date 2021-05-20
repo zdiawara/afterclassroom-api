@@ -3,11 +3,10 @@
 namespace App\Http\Requests;
 
 use App\Http\Requests\CustumRequest;
-use Illuminate\Foundation\Http\FormRequest;
 
 class StudentTeacherRequest extends CustumRequest
 {
-    
+
 
     /**
      * Get the validation rules that apply to the request.
@@ -18,8 +17,9 @@ class StudentTeacherRequest extends CustumRequest
     {
         $rules = [
             'matiere' => 'required',
-            'teacher' => 'required',
-            'classe' => 'required'
+            'teacher' => 'string',
+            'classe' => 'required',
+            'enseignement' => 'required',
         ];
         return $this->makeRules($rules);
     }

@@ -19,7 +19,6 @@ class CreateMatiereTeachersTable extends Migration
             $table->unsignedBigInteger('teacher_id');
             $table->unsignedBigInteger('etat_id');
             $table->unsignedBigInteger('level_id');
-            $table->boolean('is_principal')->default(false);
             //$table->string('justificatif')->nullable();
             $table->softDeletes();
             $table->timestamps();

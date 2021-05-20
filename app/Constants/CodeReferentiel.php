@@ -40,4 +40,8 @@ class CodeReferentiel
 
     const COLLEGE = "college";
     const LYCEE = "lycee";
+
+    const BASIC = "basic";
+    const FAQ = "faq";
+    const EXAM_SUBJECT = "exam_subject";
 }

@@ -11,19 +11,19 @@ class FindStudentTeacher
 
     public function byCode(User $user, array $params)
     {
-        $teacher = $params['teacher'];
-        $matiere = $params['matiere'];
-        $classe = $params['classe'];
-
         return StudentTeacher::where('student_id', $user->userable_id)
-            ->whereHas("classe", function ($q) use ($classe) {
-                $q->where(DB::raw('lower(classes.code)'), strtolower($classe));
+            ->whereHas("teacher.user", function ($q) use ($params) {
+                $q->where(DB::raw('lower(users.username)'), strtolower($params['teacher']));
             })
-            ->whereHas("matiere", function ($q) use ($matiere) {
-                $q->where(DB::raw('lower(matieres.code)'), strtolower($matiere));
+            ->whereHas("classe", function ($q) use ($params) {
+                $q->where(DB::raw('lower(classes.code)'), strtolower($params['classe']));
             })
-            ->whereHas("teacher.user", function ($q) use ($teacher) {
-                $q->where(DB::raw('lower(users.username)'), strtolower($teacher));
-            })->first();
+            ->whereHas("matiere", function ($q) use ($params) {
+                $q->where(DB::raw('lower(matieres.code)'), strtolower($params['matiere']));
+            })
+            ->whereHas("enseignement", function ($q) use ($params) {
+                $q->where(DB::raw('lower(referentiels.code)'), strtolower($params['enseignement']));
+            })
+            ->first();
     }
 }

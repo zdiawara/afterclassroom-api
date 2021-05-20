@@ -18,10 +18,12 @@ class CreateClasseMatieresTable extends Migration
             $table->unsignedBigInteger('classe_id');
             $table->unsignedBigInteger('matiere_id');
             $table->unsignedBigInteger('country_id');
+            $table->unsignedBigInteger('teacher_id')->nullable();
             $table->timestamps();
             $table->foreign('classe_id')->references('id')->on('classes');
             $table->foreign('matiere_id')->references('id')->on('matieres');
             $table->foreign('country_id')->references('id')->on('countries');
+            $table->foreign('teacher_id')->references('id')->on('teachers');
         });
     }
 

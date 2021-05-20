@@ -2,14 +2,11 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Chapter;
 use App\Exercise;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\ExerciseRequest;
 use App\Http\Resources\ExerciseResource;
 use App\Http\Actions\Exercise\ManageExercise;
-use Symfony\Component\HttpFoundation\Request;
-use App\Http\Actions\Checker\EnseignementChecker;
 use App\Http\Actions\Exercise\ShowExercise;
 
 class ExerciseController extends Controller

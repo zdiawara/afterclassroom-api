@@ -16,7 +16,7 @@ class ListQuestionRequest extends FormRequest
         return [
             'matiere' => 'required|string',
             'classe' => 'required|string',
-            'chapterId' => 'string',
+            // 'teacher' => 'required|string',
         ];
     }
 }

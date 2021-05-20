@@ -54,6 +54,35 @@ class Generate
         return $content;
     }
 
+    public static function genApplication($faker)
+    {
+        return '<div class="question-application">' .
+            '<div class="question-application--enonce">'
+            . $faker->paragraph(1, true) .
+            '</div>' .
+            '<div class="question-application--response">'
+            . $faker->paragraph(1, true) .
+            '</div>' .
+            '</div>';
+    }
+
+    public static function genQuestion($faker)
+    {
+
+        $content = '<div class="question-todo">'
+            . $faker->paragraph(1, true) .
+            '</div>' .
+            '<div class="question-toknow">'
+            . $faker->paragraph(1, true) .
+            '</div>';
+
+        $nbApplication = rand(1, 3);
+        for ($i = 1; $i <= $nbApplication; $i++) {
+            $content = $content . self::genApplication($faker);
+        }
+        return $content;
+    }
+
     public static function genExoContent($faker)
     {
 

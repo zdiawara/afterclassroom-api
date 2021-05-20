@@ -2,8 +2,9 @@
 
 namespace App\Http\Actions\MatiereTeacher;
 
-use App\Classe;
-use App\MatiereTeacher;
+use App\ClasseMatiere;
+
+use function Psy\debug;
 
 class FindMatiereTeacher
 {
@@ -18,13 +19,14 @@ class FindMatiereTeacher
      */
     public function findPrincipalTeacher(string $matiere, string $classe)
     {
-        $levelId = Classe::where('code', $classe)->firstOrFail()->level->id;
-        $matiereTeacher = MatiereTeacher::whereHas('matiere', function ($q) use ($matiere) {
+        $matiereTeacher = ClasseMatiere::whereHas('matiere', function ($q) use ($matiere) {
             $q->where('code', $matiere);
         })
-            ->where('level_id', $levelId)
-            ->where('is_principal', '1')
+            ->whereHas('classe', function ($q) use ($classe) {
+                $q->where('code', $classe);
+            })
             ->first();
+
         if (isset($matiereTeacher)) {
             return $matiereTeacher->teacher;
         }
