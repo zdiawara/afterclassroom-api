@@ -33,6 +33,14 @@ class Queries
         return $this;
     }
 
+    public function addTypeControle($type)
+    {
+        if (isset($type)) {
+            return $this->whereHas('type', $type);
+        }
+        return $this;
+    }
+
     public function addClasse(array $fields)
     {
         if (isset($fields['classe'])) {
@@ -65,55 +73,25 @@ class Queries
         return $this->query->get();
     }
 
-    // public function addActive($query, $canReadInactive)
-    // {
-    //     if (!$canReadInactive) {
-    //         return $query->where('is_active', 1);
-    //     }
-    //     return $query;
-    // }
+    public function addActive($canReadInactive)
+    {
+        if (!$canReadInactive) {
+            $this->query = $this->query->where('is_active', 1);
+        }
+        return $this;
+    }
 
-    // public function buildCommonQuery($query, $request)
-    // {
-    //     $page = $request->get('page', 1);
+    public function addEnonceActive(bool $canReadInactive)
+    {
+        if (!$canReadInactive) {
+            $this->query = $this->query->where('is_enonce_active', 1);
+        }
+        return $this;
+    }
 
-    //     $newQuery = $query;
-
-    //     if ($request->has('matiere')) {
-    //         $newQuery = $this->whereHas($query, 'matiere', $request->get('matiere'));
-    //     }
-    //     if ($request->has('specialite')) {
-    //         $newQuery = $this->whereHas($query, 'specialite', $request->get('specialite'));
-    //     }
-
-    //     return [
-    //         'query' => $newQuery,
-    //         'page' => $page
-    //     ];
-    // }
-
-    // public function buildQuery($query, $request)
-    // {
-    //     $result = $this->buildCommonQuery($query, $request);
-
-    //     if ($request->has('classe')) {
-    //         $result['query'] = $this->whereHas($result['query'], 'classe', $request->get('classe'));
-    //     }
-
-    //     return $result;
-    // }
-
-    // public function bookQuery($query, $request)
-    // {
-
-    //     $classe = $request->get('classe');
-
-    //     $result = $this->buildCommonQuery($query, $request);
-
-    //     if (isset($classe)) {
-    //         $result['query'] = $this->whereHas($result['query'], 'classes', $classe);
-    //     }
-
-    //     return $result;
-    // }
+    public function with(array $deps)
+    {
+        $this->query = $this->query->with($deps);
+        return $this;
+    }
 }

@@ -88,7 +88,7 @@ class DatabaseSeeder extends Seeder
 
         $this->createChapters();
         $this->createQuestions();
-        // $this->createControles();
+        $this->createExamens();
     }
 
     private function generateClasseMatieres()
@@ -150,9 +150,8 @@ class DatabaseSeeder extends Seeder
     {
 
         MatiereTeacher::all()->each(function ($matiereTeacher) {
-
             Classe::all()->each(function ($classe) use ($matiereTeacher) {
-                factory('App\Chapter', rand(4, 7))->make()->each(function ($chapter) use ($matiereTeacher, $classe) {
+                factory(Chapter::class, rand(2, 5))->make()->each(function ($chapter) use ($matiereTeacher, $classe) {
                     $chapter->teacher_id = $matiereTeacher->teacher->user->username;
                     $chapter->matiere_id = $matiereTeacher->matiere->code;
                     $chapter->classe_id = $classe->code;
@@ -160,7 +159,7 @@ class DatabaseSeeder extends Seeder
                     $chapter->toc = (new DocumentPlan())->execute($chapter->content);
                     $chapter->save();
 
-                    factory(Exercise::class, rand(5, 10))->make()->each(function ($exercise) use ($chapter) {
+                    factory(Exercise::class, rand(0, 5))->make()->each(function ($exercise) use ($chapter) {
                         $exercise->chapter_id = $chapter->id;
                         $exercise->is_enonce_active = $exercise['enonce']['active'];
                         $exercise->enonce = $exercise['enonce']['data'];
@@ -170,6 +169,24 @@ class DatabaseSeeder extends Seeder
 
                         $exercise->save();
                     });
+                });
+
+
+                factory(Controle::class, rand(1, 5))->make()->each(function ($controle)  use ($matiereTeacher, $classe) {
+                    $newControle = $this->buildControle($controle, $matiereTeacher->teacher, $matiereTeacher->matiere, $classe);
+
+                    $newControle->type_id = Referentiel::where('type', TypeReferentiel::CONTROLE)
+                        ->WhereIn('code', [CodeReferentiel::DEVOIR, CodeReferentiel::COMPOSITION])
+                        ->get()
+                        ->random()
+                        ->code;
+
+                    $newControle->trimestre_id = Referentiel::where('type', TypeReferentiel::TRIMESTRE)
+                        ->get()
+                        ->random()
+                        ->code;
+
+                    $newControle->save();
                 });
             });
         });
@@ -184,7 +201,7 @@ class DatabaseSeeder extends Seeder
                     ->where('matiere_id', $classeMatiere->matiere_id)
                     ->where('classe_id', $classeMatiere->classe_id)->get()
                     ->each(function ($chapter) {
-                        factory(Question::class, rand(5, 15))
+                        factory(Question::class, rand(1, 5))
                             ->make()
                             ->each(function ($question) use ($chapter) {
                                 $question->chapter_id = $chapter->id;
@@ -194,34 +211,44 @@ class DatabaseSeeder extends Seeder
             });
     }
 
-    private function createControles()
+    private function createExamens()
     {
-        Teacher::all()->each(function ($teacher) {
-            factory('App\Controle', rand(50, 60))->make()->each(function ($controle) use ($teacher) {
-                $newControle = new Controle();
-                $newControle->teacher_id = $teacher->user->username;
-                $newControle->classe_id = Classe::where('level_id', $teacher->level->id)->get()->random()->code;
-                $newControle->matiere_id = $teacher->matieres->random()->code;
-                //$newControle->specialite_id = $this->getSpecialite($newControle->matiere_id);
-                $newControle->year = $controle->year;
-                $newControle->active_enonce = $controle['enonce']['active'];
-                $newControle->enonce = $controle['enonce']['data'];
-                $newControle->active_correction = $controle['correction']['active'];
-                $newControle->correction = $controle['correction']['data'];
+        ClasseMatiere::whereNotNull('teacher_id')
+            ->whereHas('classe', function ($query) {
+                $query->where('is_exam_class', 1);
+            })
+            ->get()
+            ->each(function ($classeMatiere) {
+                factory(Controle::class, rand(5, 6))->make()->each(function ($controle)  use ($classeMatiere) {
 
-                $typeControle = Referentiel::where('type', TypeReferentiel::CONTROLE)->get()->random()->code;
+                    $newControle = $this->buildControle($controle, $classeMatiere->teacher, $classeMatiere->matiere, $classeMatiere->classe);
 
-                $newControle->type_id = $typeControle;
+                    $newControle->type_id = Referentiel::where('type', TypeReferentiel::CONTROLE)
+                        ->Where('code', CodeReferentiel::EXAMEN)
+                        ->get()
+                        ->random()
+                        ->code;
 
-                if ($typeControle !== CodeReferentiel::EXAMEN) {
-                    $newControle->trimestre_id = Referentiel::where('type', TypeReferentiel::TRIMESTRE)->get()->random()->code;
-                } else {
-                    $newControle->subject_id = Referentiel::where('type', TypeReferentiel::EXAMEN)->get()->random()->code;
-                }
-
-                $newControle->save();
+                    $newControle->save();
+                });
             });
-        });
+    }
+
+
+    private function buildControle(Controle $controle, Teacher $teacher, Matiere $matiere, Classe $classe)
+    {
+        $newControle = new Controle();
+        $newControle->teacher_id = $teacher->user->username;
+        $newControle->classe_id = $classe->code;
+        $newControle->matiere_id = $matiere->code;
+        $newControle->year = $controle->year;
+        $newControle->is_public = $controle->is_public;
+        $newControle->is_enonce_active = 1; // $controle['enonce']['active'];
+        $newControle->enonce = $controle['enonce']['data'];
+        $newControle->is_correction_active = 1; // $controle['correction']['active'];
+        $newControle->correction = $controle['correction']['data'];
+
+        return $newControle;
     }
 
     private function getSpecialite($matiere)

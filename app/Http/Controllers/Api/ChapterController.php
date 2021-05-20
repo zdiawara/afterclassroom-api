@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Api;
 
 use App\Chapter;
 
@@ -15,16 +15,12 @@ use App\Http\Resources\ChapterCollection;
 use App\Http\Resources\ExerciseCollection;
 use App\Http\Resources\QuestionCollection;
 use App\Http\Actions\Chapter\ManageChapter;
-use App\Http\Actions\Chapter\SearchChapter;
+use App\Http\Actions\Chapter\ListChapter;
 use App\Http\Actions\Exercise\ListExercise;
 use App\Http\Actions\Question\ListQuestion;
-use App\Http\Actions\Teacher\FindTeacher;
-use App\Teacher;
 
 class ChapterController extends Controller
 {
-    private UserChecker $userChecker;
-
     public function __construct(UserChecker $userChecker)
     {
         $this->middleware(['auth:api']);
@@ -32,14 +28,11 @@ class ChapterController extends Controller
         $this->userChecker = $userChecker;
     }
 
-    public function index(ListChapterRequest $request, SearchChapter $searchChapter, FindTeacher $findTeacher)
+    public function index(ListChapterRequest $request, ListChapter $listChapter)
     {
-        $username = $request->get('teacher');
-        $teacher = $findTeacher->byUsername($username);
+        $teacher = $request->get('teacher');
         $params = $request->only(['classe', 'specialite', 'matiere']);
-        return (new ChapterCollection(
-            $searchChapter->byTeacher($request->get('teacher'), $params)
-        ))->additional(['teacher' => new TeacherResource($teacher)]);
+        return new ChapterCollection($listChapter->execute($teacher, $params));
     }
 
     public function show(Chapter $chapter, ShowChapter $showChapter)

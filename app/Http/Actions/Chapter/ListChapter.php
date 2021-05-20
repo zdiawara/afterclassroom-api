@@ -9,7 +9,7 @@ use App\Http\Actions\Checker\UserChecker;
 use App\Http\Actions\Content\DataAccess;
 use App\Http\Actions\Content\ReadContent;
 
-class SearchChapter
+class ListChapter
 {
 
     private UserChecker $userChecker;
@@ -23,7 +23,7 @@ class SearchChapter
         $this->dataAccess = $dataAccess;
     }
 
-    public function byTeacher(string $teacher, array $params = [])
+    public function execute(string $teacher, array $params = [])
     {
         $query = Chapter::whereHas('teacher.user', function ($q) use ($teacher) {
             $q->where(DB::raw('lower(users.username)'), strtolower($teacher));

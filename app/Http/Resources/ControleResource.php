@@ -17,11 +17,16 @@ class ControleResource extends EnseignementResource
     public function toArray($request)
     {
         $controle = [
+            'id' => (string) $this->id,
             'year' => $this->year,
             'type' => new ReferentielResource($this->whenLoaded('type')),
             'trimestre' => new ReferentielResource($this->whenLoaded('trimestre')),
-            'subject' => new ReferentielResource($this->whenLoaded('subject')),            
+            'position' => $this->position,
+            'public' => (string) $this->is_public,
+            'updated' => $this->updated_at,
+            'created' => $this->created_at,
         ];
-        return array_merge(parent::toArray($request), $controle,(new ExerciseContent)->build($this));
+
+        return array_merge($controle, (new ExerciseContent)->build($this));
     }
 }

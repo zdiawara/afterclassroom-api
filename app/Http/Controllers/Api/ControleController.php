@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Api;
 
 use App\Matiere;
 use App\Controle;
-use App\Http\Actions\Queries;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\ControleRequest;
 use App\Http\Resources\ControleResource;
@@ -13,7 +12,8 @@ use App\Http\Resources\ControleCollection;
 use Symfony\Component\HttpFoundation\Request;
 use App\Http\Actions\Checker\EnseignementChecker;
 use App\Http\Actions\Checker\TeacherMatiereChecker;
-
+use App\Http\Actions\Controle\ListControle;
+use App\Http\Requests\ListControleRequest;
 
 class ControleController extends Controller
 {
@@ -32,57 +32,14 @@ class ControleController extends Controller
         $this->userChecker = $userChecker;
     }
 
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function index(Queries $queries, Request $request)
+    public function index(ListControleRequest $request, ListControle $listControle)
     {
-        //
-        $teacher = $request->get('teacher');
         $type = $request->get('type');
-        $trimestre = $request->get('trimestre');
-        $subject = $request->get('subject');
-
-        $query = Controle::whereHas('teacher.user', function ($q) use ($teacher) {
-            $q->where('username', $teacher);
-        });
-
-        if ($type) {
-            $query = $query->whereHas('type', function ($q) use ($type) {
-                $q->where('code', $type);
-            });
-        }
-
-
-        if ($trimestre) {
-            $query = $query->whereHas('trimestre', function ($q) use ($trimestre) {
-                $q->where('code', $trimestre);
-            });
-        } else if ($subject) {
-            $query = $query->whereHas('subject', function ($q) use ($subject) {
-                $q->where('code', $subject);
-            });
-        }
-
-        $canReadInactive = $this->userChecker->canReadInactive($teacher);
-        if (!$canReadInactive) {
-            $query = $query->where('active_enonce', 1);
-        }
-
-        $result = []; //$queries->buildQuery($query, $request);
-
-        //return new ControleCollection($result['query']->with(['type','teacher','subject'])->paginate(9,['*'], 'page', $result['page']));
-        return new ControleCollection($result['query']->with(['type', 'trimestre', 'subject'])->get());
+        $params = $request->only(['classe', 'trimestre', 'matiere', 'teacher']);
+        return new ControleCollection($listControle->execute($type, $params));
     }
 
-    /**
-     * Crée un controle
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
+
     public function store(ControleRequest $request)
     {
         //
@@ -105,13 +62,6 @@ class ControleController extends Controller
         return $this->createdResponse(new ControleResource($controle));
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function update(ControleRequest $request, Controle $controle)
     {
         // Verifie que l'ut connecté peut créer modifier le controle

@@ -24,35 +24,36 @@ class ListExercise
 
     public function byChapter(Chapter $chapter)
     {
+
         $teacher = $chapter->teacher->user->username;
 
         $query = $chapter->exercises()->with(['type']);
 
-        if (!$this->userChecker->canReadInactive($teacher)) {
-            $query = $query->where('is_enonce_active', 1);
-        }
+        $canReadInactive = $this->userChecker->canReadInactive($teacher);
+
+        $exercises = Queries::of($query)
+            ->orderByPosition()
+            ->addEnonceActive($canReadInactive)
+            ->get();
 
         $canReadContent = $this->dataAccess->canReadContent($teacher, [
             "matiere" => $chapter->matiere->code,
             "classe" => $chapter->classe->code
         ]);
 
-        $exercises = Queries::of($query)
-            ->orderByPosition()
-            ->get();
+        // traiter les cas où la correction est inactifs
+        if (!$canReadContent) {
+            $exercises = $exercises
+                ->map(function ($exercise) {
+                    if (!$exercise->is_correction_active) {
+                        $exercise->correction = "Ce contenu est inactif.";
+                    }
+                    return $exercise;
+                });
+        }
 
         $exercises = $exercises->map(fn ($exercise) => $this->readContent->byExercise($exercise, $canReadContent));
 
-        if ($this->userChecker->canReadInactive($teacher)) {
-            return $exercises;
-        }
-        // traiter les cas où la correction est inactifs
-        return $exercises
-            ->map(function ($exercise) {
-                if (!$exercise->is_correction_active) {
-                    $exercise->correction = null;
-                }
-                return $exercise;
-            });
+        return $exercises;
     }
 }
