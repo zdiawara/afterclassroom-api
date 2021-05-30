@@ -45,15 +45,4 @@ class Controle extends Enseignement
             $this->attributes['trimestre_id'] = $ref->id;
         }
     }
-
-    public function setSubjectIdAttribute($code)
-    {
-        if (!is_null($code)) {
-            $ref = Referentiel::where('code', $code)->where('type', TypeReferentiel::EXAMEN)->first();
-            if (is_null($ref)) {
-                throw new BadRequestException("Le référentiel " . $code . " est incorrect");
-            }
-            $this->attributes['subject_id'] = $ref->id;
-        }
-    }
 }

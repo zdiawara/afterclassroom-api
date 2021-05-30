@@ -9,16 +9,16 @@ use Illuminate\Http\Request;
 use App\Constants\CodeReferentiel;
 use App\Http\Controllers\Controller;
 use App\Http\Actions\File\UploadFile;
-use App\Http\Actions\User\UserChecker;
+
+use App\Http\Actions\Checker\UserChecker;
 use App\Http\Requests\TeacherMatiereRequest;
 use App\Http\Resources\MatiereTeacherResource;
-use App\Http\Actions\Referentiel\FindReferentiel;
 use App\Http\Resources\MatiereTeacherCollection;
+use App\Http\Actions\Referentiel\FindReferentiel;
 
 class TeacherMatiereController extends Controller
 {
     private $userChecker;
-    private $uploadFile;
 
     public function __construct(UserChecker $userChecker, UploadFile $uploadFile)
     {
@@ -103,7 +103,7 @@ class TeacherMatiereController extends Controller
      */
     public function destroy(Teacher $teacher, Matiere $matiere)
     {
-        $this->userChecker->canDeleteTeacherMatiere($teacher, $matiere);
+        //$this->userChecker->canDeleteTeacherMatiere($teacher, $matiere);
         $teacher->matieres()->detach($matiere->id);
         return $this->deletedResponse();
     }
