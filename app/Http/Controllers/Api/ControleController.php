@@ -9,7 +9,6 @@ use App\Http\Requests\ControleRequest;
 use App\Http\Resources\ControleResource;
 use App\Http\Actions\Checker\UserChecker;
 use App\Http\Resources\ControleCollection;
-use Symfony\Component\HttpFoundation\Request;
 use App\Http\Actions\Checker\EnseignementChecker;
 use App\Http\Actions\Checker\TeacherMatiereChecker;
 use App\Http\Actions\Controle\ListControle;
@@ -21,15 +20,12 @@ class ControleController extends Controller
 
     private $teacherMatiereChecker;
 
-    private $userChecker;
-
-    public function __construct(UserChecker $userChecker, EnseignementChecker $enseignementChecker, TeacherMatiereChecker $teacherMatiereChecker)
+    public function __construct(EnseignementChecker $enseignementChecker, TeacherMatiereChecker $teacherMatiereChecker)
     {
         $this->middleware(['auth:api']);
         $this->middleware('role:teacher', ['only' => ['store', 'update']]);
         $this->enseignementChecker = $enseignementChecker;
         $this->teacherMatiereChecker = $teacherMatiereChecker;
-        $this->userChecker = $userChecker;
     }
 
     public function index(ListControleRequest $request, ListControle $listControle)

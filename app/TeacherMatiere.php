@@ -2,21 +2,19 @@
 
 namespace App;
 
-use Exception;
 use App\Matiere;
 use App\Teacher;
 use App\Referentiel;
-use App\Constants\CodeReferentiel;
 use App\Constants\TypeReferentiel;
 use App\Exceptions\BadRequestException;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class MatiereTeacher extends Model
+class TeacherMatiere extends Model
 {
     use SoftDeletes;
 
-    protected $table = 'matiere_teacher';
+    protected $table = 'teacher_matiere';
 
     protected $fillable = array('teacher_id', 'matiere_id', 'justificatif', 'level_id', 'etat_id');
 
@@ -42,10 +40,10 @@ class MatiereTeacher extends Model
         return $this->belongsTo(Referentiel::class);
     }
 
-    public function setMatiereIdAttribute($code)
+    public function setMatiereIdAttribute($id)
     {
-        if (!is_null($code)) {
-            $this->attributes['matiere_id'] = Matiere::where('code', $code)->firstOrFail()->id;
+        if (!is_null($id)) {
+            $this->attributes['matiere_id'] = Matiere::findOrFail($id)->id;
         }
     }
 
@@ -54,22 +52,20 @@ class MatiereTeacher extends Model
         if (!is_null($id)) {
             $etat = Referentiel::findOrFail($id);
             if ($etat->type != TypeReferentiel::ETAT) {
-                throw new Exception("Referentiel incorrect", 1);
+                throw new BadRequestException("Le référentiel " . $id . " est incorrect");
             }
-            $this->attributes['etat_id'] = $etat->id;
+            $this->attributes['etat_id'] = $id;
         }
     }
 
-    public function setLevelIdAttribute($code)
+    public function setLevelIdAttribute($id)
     {
-        if (!is_null($code)) {
-            $level = Referentiel::where('code', $code)
-                ->where('type', TypeReferentiel::LEVEL)
-                ->firstOrFail();
-            if (!isset($level)) {
-                throw new BadRequestException("Referentiel incorrect " . $code, 1);
+        if (!is_null($id)) {
+            $etat = Referentiel::findOrFail($id);
+            if ($etat->type != TypeReferentiel::LEVEL) {
+                throw new BadRequestException("Le référentiel " . $id . " est incorrect");
             }
-            $this->attributes['level_id'] = $level->id;
+            $this->attributes['level_id'] = $id;
         }
     }
 }

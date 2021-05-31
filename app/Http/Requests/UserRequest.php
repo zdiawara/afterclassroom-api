@@ -2,8 +2,8 @@
 
 namespace App\Http\Requests;
 
+use Illuminate\Validation\Rule;
 use App\Http\Requests\CustumRequest;
-use Illuminate\Foundation\Http\FormRequest;
 
 class UserRequest extends CustumRequest
 {
@@ -17,15 +17,15 @@ class UserRequest extends CustumRequest
      */
     public function rules()
     {
+
         return [
             'firstname' => 'required|max:50|min:2',
             'lastname' => 'required|max:50|min:2',
-            //'username' => "required|max:50|min:3|unique:users,username,".$this->userId,
-            'email' => 'required|email|max:50|unique:users,email,' . $this->userId,
+            'email' => ['required', 'max:50', 'email', Rule::unique('users')->where(function ($query) {
+                return $query->where('username_', $this->userId);
+            })],
+
             'password' => 'required|min:6',
-            //'gender' => 'required',
-            //'avatar' => 'mimes:png,jpeg,jpg',
-            //'avatar' => 'mimes:png,jpeg,jpg',
         ];
     }
 }

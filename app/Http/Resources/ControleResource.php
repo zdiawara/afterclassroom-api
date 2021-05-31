@@ -17,7 +17,7 @@ class ControleResource extends EnseignementResource
     public function toArray($request)
     {
         $controle = [
-            'id' => (string) $this->id,
+            'id' =>  $this->id,
             'year' => $this->year,
             'type' => new ReferentielResource($this->whenLoaded('type')),
             'trimestre' => new ReferentielResource($this->whenLoaded('trimestre')),

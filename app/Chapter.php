@@ -42,11 +42,11 @@ class Chapter extends Enseignement
         return $this->hasMany(Question::class);
     }
 
-    public function setSpecialiteIdAttribute($code)
+    public function setSpecialiteIdAttribute($id)
     {
-        if (!is_null($code)) {
-            $specialite = Specialite::where('code', $code)->first();
-            if (isset($specialite)) {
+        if (!is_null($id)) {
+            $specialite = Specialite::find($id);
+            if (isset($specialite) && $specialite->matiere_id == $this->matiere_id) {
                 $this->attributes['specialite_id'] = $specialite->id;
             } else {
                 throw new PrivilegeException("Impossible d'associer cette spécialité et la matière !");

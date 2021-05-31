@@ -20,9 +20,9 @@ class StudentTeacherManagementTest extends TestCase
     public function a_student_can_add_a_teacher()
     {
         $this->withoutExceptionHandling();
-        
+
         $this->createStudent();
-        
+
         $studentTeacher = factory(StudentTeacher::class)->make();
         $student = Student::first();
         $student->update([
@@ -30,18 +30,19 @@ class StudentTeacherManagementTest extends TestCase
         ]);
 
         $response = $this->actingAs($student->user)
-            ->post(route('students.teachers.store',['student' => $student->id ]),
-            $studentTeacher->toArray()
-        );
-        
+            ->post(
+                route('students.teachers.store', ['student' => $student->id]),
+                $studentTeacher->toArray()
+            );
+
         $response
             ->assertStatus(Response::HTTP_CREATED);
 
         $created = StudentTeacher::first();
-        $this->assertTrue($created->teacher->id==$studentTeacher->teacher);
-        $this->assertTrue($created->classe->id==$studentTeacher->classe);
-        $this->assertTrue($created->matiere->id==$studentTeacher->matiere);
-        $this->assertTrue($created->collegeYear->etat->code==CodeReferentiel::IN_PROGRESS);
+        $this->assertTrue($created->teacher->id == $studentTeacher->teacher);
+        $this->assertTrue($created->classe->id == $studentTeacher->classe);
+        $this->assertTrue($created->matiere->id == $studentTeacher->matiere);
+        $this->assertTrue($created->collegeYear->etat->code == CodeReferentiel::IN_PROGRESS);
     }
 
     /** @test **/
@@ -53,16 +54,16 @@ class StudentTeacherManagementTest extends TestCase
 
         $matiere = factory(Matiere::class)->create();
 
-        $teacher->matieres()->attach($matiere->id,[
-            "etat_id" => factory(Referentiel::class)->create(['type' => TypeReferentiel::ETAT ])->id,
+        $teacher->matieres()->attach($matiere->id, [
+            "etat_id" => factory(Referentiel::class)->create(['type' => TypeReferentiel::ETAT])->id,
             "justificatif" => "test.pdf"
         ]);
 
-        $teacherMatiere = factory(MatiereTeacher::class)->make(["matiere"=>$matiere->id ]);
+        $teacherMatiere = factory(TeacherMatiere::class)->make(["matiere" => $matiere->id]);
 
         $response = $this->actingAs($teacher->user)
-            ->post(route('teachers.matieres.store',['teacher' => $teacher->id]),$teacherMatiere->toArray());
-        
+            ->post(route('teachers.matieres.store', ['teacher' => $teacher->id]), $teacherMatiere->toArray());
+
         $response
             ->assertStatus(Response::HTTP_CONFLICT);
     }
@@ -75,18 +76,15 @@ class StudentTeacherManagementTest extends TestCase
         $teacher = factory(Teacher::class)->create();
         $matiere = factory(Matiere::class)->create();
 
-        $teacher->matieres()->attach($matiere->id,[
-            "etat_id" => factory(Referentiel::class)->create(['type' => TypeReferentiel::ETAT ])->id,
+        $teacher->matieres()->attach($matiere->id, [
+            "etat_id" => factory(Referentiel::class)->create(['type' => TypeReferentiel::ETAT])->id,
             "justificatif" => "test.pdf"
         ]);
 
         $response = $this->actingAs($teacher->user)
-            ->delete(route('teachers.matieres.destroy',['teacher' => $teacher->id,'matiere'=>$matiere->id]));
+            ->delete(route('teachers.matieres.destroy', ['teacher' => $teacher->id, 'matiere' => $matiere->id]));
 
         $response
             ->assertStatus(Response::HTTP_NO_CONTENT);
     }
-
-
-
 }

@@ -13,7 +13,7 @@ use App\Controle;
 use App\Exercise;
 use App\Specialite;
 use App\Referentiel;
-use App\MatiereTeacher;
+use App\TeacherMatiere;
 use App\Constants\CodeReferentiel;
 use App\Constants\TypeReferentiel;
 use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
@@ -77,7 +77,7 @@ abstract class TestCase extends BaseTestCase
                 ->except(['code', 'type'])
                 ->all()
         );
-        MatiereTeacher::where('teacher_id', $teacherCreated->id)->update(['etat_id' =>  $refValidated->id]);
+        TeacherMatiere::where('teacher_id', $teacherCreated->id)->update(['etat_id' =>  $refValidated->id]);
         return ['teacher' => $teacherCreated, 'response' => $response];
     }
 

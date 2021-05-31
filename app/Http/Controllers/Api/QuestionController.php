@@ -7,7 +7,7 @@ use App\Http\Requests\QuestionRequest;
 use App\Http\Resources\QuestionResource;
 use App\Http\Actions\Checker\EnseignementChecker;
 use App\Http\Actions\Checker\TeacherMatiereChecker;
-use App\Http\Actions\MatiereTeacher\FindMatiereTeacher;
+use App\Http\Actions\TeacherMatiere\FindTeacherMatiere;
 use App\Http\Actions\Question\SearchQuestion;
 use App\Http\Requests\ListQuestionRequest;
 use App\Http\Resources\NotionResource;
@@ -26,10 +26,10 @@ class QuestionController extends Controller
         $this->teacherMatiereChecker = $teacherMatiereChecker;
     }
 
-    public function index(ListQuestionRequest $request, SearchQuestion $searchQuestion, FindMatiereTeacher $findMatiereTeacher)
+    public function index(ListQuestionRequest $request, SearchQuestion $searchQuestion, FindTeacherMatiere $findTeacherMatiere)
     {
         $params = $request->only(['classe', 'matiere']);
-        $teacher = $findMatiereTeacher->findPrincipalTeacher($params['matiere'], $params['classe']);
+        $teacher = $findTeacherMatiere->findPrincipalTeacher($params['matiere'], $params['classe']);
         return NotionResource::collection(isset($teacher) ? $searchQuestion->byChapters(
             $teacher->user->username,
             $params

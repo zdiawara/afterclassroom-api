@@ -11,27 +11,34 @@ use App\Referentiel;
 use App\StudentTeacher;
 use App\Constants\CodeReferentiel;
 use App\Constants\TypeReferentiel;
+use App\Http\Actions\User\ManageUser;
+use App\Http\Actions\User\ManageIdentify;
 use App\Http\Actions\Checker\StudentChecker;
 use App\Http\Actions\Checker\TeacherMatiereChecker;
 use App\Http\Actions\TeacherMatiere\FindTeacherMatiere;
 
-class ManageStudentTeacher
+class CreateStudent
 {
 
-    private FindTeacherMatiere $findTeacherMatiere;
-    private TeacherMatiereChecker $teacherMatiereChecker;
-    private StudentChecker $studentChecker;
+    private ManageUser $manageUser;
+    private ManageIdentify $manageIdentify;
 
-    public function __construct(FindTeacherMatiere $findTeacherMatiere, TeacherMatiereChecker $teacherMatiereChecker, StudentChecker $studentChecker)
+    public function __construct(ManageUser $manageUser,  ManageIdentify $manageIdentify)
     {
-        $this->findTeacherMatiere = $findTeacherMatiere;
-        $this->teacherMatiereChecker = $teacherMatiereChecker;
-        $this->studentChecker = $studentChecker;
+        $this->manageUser = $manageUser;
+        $this->manageIdentify = $manageIdentify;
     }
 
 
-    public function execute(Student $student, array $params)
+    public function execute(array $fields)
     {
+        $student = new Student($fields);
+
+        $student->save();
+
+        $student->user()->save($user = $this->manageUser->create($request, $username));
+
+
         $enseignement = Referentiel::where('code', $params['enseignement'])
             ->where('type', TypeReferentiel::ENSEIGNEMENT)
             ->firstOrFail();

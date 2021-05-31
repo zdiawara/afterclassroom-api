@@ -2,10 +2,11 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\User;
 use App\Student;
+use App\CollegeYear;
 use App\Mail\UserIdentify;
-use Illuminate\Http\Request;
+use App\Constants\CodeReferentiel;
+use Illuminate\Support\Facades\DB;
 use App\Http\Actions\User\UserField;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Mail;
@@ -13,9 +14,8 @@ use App\Http\Actions\User\ManageUser;
 use App\Http\Requests\StudentRequest;
 use App\Http\Resources\StudentResource;
 use App\Http\Actions\Checker\UserChecker;
+use App\Http\Actions\User\ManageIdentify;
 use App\Http\Actions\Classe\ListClasseMatiere;
-use Illuminate\Support\Facades\DB;
-
 
 class StudentController extends Controller
 {
@@ -42,32 +42,34 @@ class StudentController extends Controller
     private function extractStudentFields($request)
     {
         $fields = [];
-        if ($request->has('classe')) {
-            $fields['classe_id'] = $request->get('classe');
-        }
+        // if ($request->has('classe')) {
+        //     $fields['classe_id'] = $request->get('classe');
+        // }
         return $fields;
     }
 
     private function loadDependences(Student $student)
     {
-        $student->load(['classe.level', 'user']);
+        $student->load(['user']);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(StudentRequest $request,  ManageUser $manageUser)
+
+    public function store(StudentRequest $request,  ManageUser $manageUser,  ManageIdentify $manageIdentify)
     {
-        $student = new Student($this->extractStudentFields($request));
 
         DB::beginTransaction();
 
-        $student->save();
+        $username = $manageIdentify->buildIdentify();
 
-        $student->user()->save($user = $manageUser->create($request));
+        $student = new Student(['id' => $username]);
+        $student->save();
+        $student->user()->save($user = $manageUser->create($request, $username));
+
+        $student->classes()->attach($request->get('classe'), [
+            'college_year_id' => CollegeYear::where('etat_id', CodeReferentiel::IN_PROGRESS)
+                ->firstOrFail()->id,
+            'changed' => 1
+        ]);
 
         Mail::to($user->email)->queue(new UserIdentify($user));
 
@@ -78,24 +80,11 @@ class StudentController extends Controller
         return $this->createdResponse(new StudentResource($student));
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function show($id)
     {
         //
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function update(StudentRequest $request, Student $student, ListClasseMatiere $listClasseMatiere)
     {
         //
@@ -106,6 +95,7 @@ class StudentController extends Controller
 
         $student->user()->update($this->userField->extract($request));
         DB::commit();
+
         $this->loadDependences($student);
 
         if ($request->has("classe")) {
@@ -115,12 +105,6 @@ class StudentController extends Controller
         return $this->createdResponse(new StudentResource($student));
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function destroy($id)
     {
         //

@@ -4,7 +4,7 @@ namespace App\Http\Actions\Checker;
 
 use App\Matiere;
 use App\Teacher;
-use App\MatiereTeacher;
+use App\TeacherMatiere;
 use App\Constants\CodeReferentiel;
 use App\Http\Actions\Checker\Checker;
 
@@ -18,15 +18,14 @@ class TeacherMatiereChecker extends Checker
             return false;
         }
 
-        $teacherMatiere = MatiereTeacher::where('teacher_id', $teacher->id)
+        $teacherMatiere = TeacherMatiere::where('teacher_id', $teacher->id)
             ->where('matiere_id', $matiere->id)
-            ->with(['etat'])
             ->first();
 
         if (is_null($teacherMatiere)) {
             $this->updatePrivilegeException("Cet enseignant n'enseigne pas en " . $matiere->name);
         }
-        if (!collect($etats)->contains($teacherMatiere->etat->code)) {
+        if (!collect($etats)->contains($teacherMatiere->etat_id)) {
             $this->updatePrivilegeException("Impossible de publier sur la plateforme. Votre matière n'est pas validée");
         }
         return true;
@@ -57,7 +56,7 @@ class TeacherMatiereChecker extends Checker
 
         $user = auth()->userOrFail();
 
-        $teacherMatiere = MatiereTeacher::where('teacher_id', $teacher->id)
+        $teacherMatiere = TeacherMatiere::where('teacher_id', $teacher->id)
             ->where('matiere_id', $matiere->id)
             ->first();
 

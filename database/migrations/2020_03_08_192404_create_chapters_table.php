@@ -14,7 +14,7 @@ class CreateChaptersTable extends Migration
     public function up()
     {
         Schema::create('chapters', function (Blueprint $table) {
-            $table->id();
+            $table->uuid("id")->primary();
             $table->string('title', 100);
             $table->smallInteger('position')->default(1);
             $table->string('resume', 255)->nullable();
@@ -22,10 +22,10 @@ class CreateChaptersTable extends Migration
             $table->longText('toc')->nullable();
             $table->boolean('is_public')->default(true);
             $table->boolean('is_active')->default(false);
-            $table->unsignedBigInteger('teacher_id');
-            $table->unsignedBigInteger('classe_id');
-            $table->unsignedBigInteger('specialite_id')->nullable();
-            $table->unsignedBigInteger('matiere_id');
+            $table->string('teacher_id');
+            $table->string('classe_id');
+            $table->string('specialite_id')->nullable();
+            $table->string('matiere_id');
             $table->timestamps();
             //$table->softDeletes();
 

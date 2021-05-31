@@ -7,7 +7,7 @@ use App\Http\Resources\ReferentielResource;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 
-class MatiereTeacherResource extends JsonResource
+class TeacherMatiereResource extends JsonResource
 {
     /**
      * Transform the resource into an array.

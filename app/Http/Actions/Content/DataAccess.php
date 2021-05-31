@@ -15,9 +15,9 @@ class DataAccess
         $this->findStudentTeacher = $findStudentTeacher;
     }
 
-    public function canReadContent(string $teacher, array $params = [])
+    public function canReadContent(string $teacherId, array $paramsIds = [])
     {
-        return $this->canRead(CodeReferentiel::BASIC, $teacher, $params);
+        return $this->canRead(CodeReferentiel::BASIC, $teacherId, $paramsIds);
     }
 
     public function canReadQuestion(string $teacher, array $params = [])
@@ -30,17 +30,17 @@ class DataAccess
         return $this->canRead(CodeReferentiel::EXAM_SUBJECT, $teacher, $params);
     }
 
-    private function canRead(string $enseignement, string $teacher, array $params = [])
+    private function canRead(string $enseignement, string $teacherId, array $paramsIds = [])
     {
         $user = auth()->userOrFail();
-        if ($user->isTeacher() && $user->isOwner($teacher)) {
+        if ($user->isTeacher() && $user->isOwner($teacherId)) {
             return true;
         }
         $_params = array_merge(
-            $params,
-            ["teacher" => $teacher, 'enseignement' => $enseignement]
+            $paramsIds,
+            ["teacher" => $teacherId, 'enseignement' => $enseignement]
         );
-        if ($user->isStudent() && $this->findStudentTeacher->byCode($user, $_params) != null) {
+        if ($user->isStudent() && $this->findStudentTeacher->byId($user, $_params) != null) {
             return true;
         }
         return false;

@@ -20,7 +20,7 @@ class Queries
     public function addMatiere(array $fields)
     {
         if (isset($fields['matiere'])) {
-            return $this->whereHas('matiere', $fields['matiere']);
+            $this->query = $this->query->where('matiere_id', $fields['matiere']);
         }
         return $this;
     }
@@ -28,7 +28,7 @@ class Queries
     public function addSpecialite(array $fields)
     {
         if (isset($fields['specialite'])) {
-            return $this->whereHas('specialite', $fields['specialite']);
+            $this->query = $this->query->where('specialite_id', $fields['specialite']);
         }
         return $this;
     }
@@ -36,7 +36,7 @@ class Queries
     public function addTypeControle($type)
     {
         if (isset($type)) {
-            return $this->whereHas('type', $type);
+            $this->query = $this->query->where('type_id', $type);
         }
         return $this;
     }
@@ -44,7 +44,7 @@ class Queries
     public function addClasse(array $fields)
     {
         if (isset($fields['classe'])) {
-            return $this->whereHas('classe', $fields['classe']);
+            $this->query = $this->query->where('classe_id', $fields['classe']);
         }
         return $this;
     }

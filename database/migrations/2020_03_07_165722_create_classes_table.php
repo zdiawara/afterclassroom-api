@@ -15,14 +15,13 @@ class CreateClassesTable extends Migration
     {
         Schema::create('classes', function (Blueprint $table) {
 
-            $table->id();
+            $table->string("id")->primary();
             $table->string('name', 50);
             $table->string('abreviation', 10)->unique();
-            $table->string('code', 20)->unique();
             $table->smallInteger('position');
             $table->boolean('is_exam_class')->default(false);
             $table->boolean('has_faq')->default(false);
-            $table->unsignedBigInteger('level_id');
+            $table->string('level_id');
             $table->timestamps();
 
             $table->foreign('level_id')->references('id')->on('referentiels');

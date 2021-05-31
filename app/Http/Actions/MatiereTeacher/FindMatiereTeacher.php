@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Http\Actions\MatiereTeacher;
+namespace App\Http\Actions\TeacherMatiere;
 
 use App\ClasseMatiere;
 
 use function Psy\debug;
 
-class FindMatiereTeacher
+class FindTeacherMatiere
 {
 
     public function __construct()
@@ -19,7 +19,7 @@ class FindMatiereTeacher
      */
     public function findPrincipalTeacher(string $matiere, string $classe)
     {
-        $matiereTeacher = ClasseMatiere::whereHas('matiere', function ($q) use ($matiere) {
+        $teacherMatiere = ClasseMatiere::whereHas('matiere', function ($q) use ($matiere) {
             $q->where('code', $matiere);
         })
             ->whereHas('classe', function ($q) use ($classe) {
@@ -27,8 +27,8 @@ class FindMatiereTeacher
             })
             ->first();
 
-        if (isset($matiereTeacher)) {
-            return $matiereTeacher->teacher;
+        if (isset($teacherMatiere)) {
+            return $teacherMatiere->teacher;
         }
         return null;
     }

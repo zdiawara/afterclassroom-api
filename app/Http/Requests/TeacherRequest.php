@@ -2,10 +2,7 @@
 
 namespace App\Http\Requests;
 
-use App\Rules\CheckMatieres;
 use App\Http\Requests\UserRequest;
-use App\Http\Requests\CustumRequest;
-use Illuminate\Foundation\Http\FormRequest;
 
 class TeacherRequest extends UserRequest
 {

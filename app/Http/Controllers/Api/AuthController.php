@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Classe;
-use App\MatiereTeacher;
+use App\TeacherMatiere;
 use App\Http\Actions\Classe\ListClasseMatiere;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\StudentResource;
@@ -57,7 +57,7 @@ class AuthController extends Controller
 
         if ($user->isTeacher()) {
             $teacher = $user->userable;
-            $teacher['teacher_matieres'] = MatiereTeacher::where('teacher_id', $teacher->id)
+            $teacher['teacher_matieres'] = TeacherMatiere::where('teacher_id', $teacher->id)
                 ->with(['matiere.specialites', 'etat', 'level'])
                 ->get();
 

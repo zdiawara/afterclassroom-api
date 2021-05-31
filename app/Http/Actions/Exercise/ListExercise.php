@@ -25,7 +25,7 @@ class ListExercise
     public function byChapter(Chapter $chapter)
     {
 
-        $teacher = $chapter->teacher->user->username;
+        $teacher = $chapter->teacher_id;
 
         $query = $chapter->exercises()->with(['type']);
 
@@ -37,8 +37,8 @@ class ListExercise
             ->get();
 
         $canReadContent = $this->dataAccess->canReadContent($teacher, [
-            "matiere" => $chapter->matiere->code,
-            "classe" => $chapter->classe->code
+            "matiere" => $chapter->matiere_id,
+            "classe" => $chapter->classe_id
         ]);
 
         // traiter les cas où la correction est inactifs

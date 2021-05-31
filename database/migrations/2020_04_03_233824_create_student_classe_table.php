@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateStudentTeachersTable extends Migration
+class CreateStudentClasseTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,21 +13,16 @@ class CreateStudentTeachersTable extends Migration
      */
     public function up()
     {
-        Schema::create('student_teacher', function (Blueprint $table) {
-            $table->id();
+        Schema::create('student_classe', function (Blueprint $table) {
             $table->string('student_id');
-            $table->string('teacher_id');
             $table->string('classe_id');
-            $table->string('matiere_id');
-            $table->string('enseignement_id'); // enseignement | faq | exam_subject
             $table->year('college_year_id');
+            $table->integer('changed')->default(1);
             $table->timestamps();
-            $table->softDeletes();
-            $table->foreign('enseignement_id')->references('id')->on('referentiels');
-            $table->foreign('teacher_id')->references('id')->on('teachers');
+
+            $table->unique(['student_id', 'college_year_id']);
             $table->foreign('student_id')->references('id')->on('students');
             $table->foreign('classe_id')->references('id')->on('classes');
-            $table->foreign('matiere_id')->references('id')->on('matieres');
             $table->foreign('college_year_id')->references('id')->on('college_years');
         });
     }
@@ -39,6 +34,6 @@ class CreateStudentTeachersTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('student_teacher');
+        Schema::dropIfExists('student_classe');
     }
 }

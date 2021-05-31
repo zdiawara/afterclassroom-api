@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Matiere;
 use App\Teacher;
-use App\MatiereTeacher;
+use App\TeacherMatiere;
 use Illuminate\Http\Request;
 use App\Constants\CodeReferentiel;
 use App\Http\Controllers\Controller;
@@ -12,8 +12,8 @@ use App\Http\Actions\File\UploadFile;
 
 use App\Http\Actions\Checker\UserChecker;
 use App\Http\Requests\TeacherMatiereRequest;
-use App\Http\Resources\MatiereTeacherResource;
-use App\Http\Resources\MatiereTeacherCollection;
+use App\Http\Resources\TeacherMatiereResource;
+use App\Http\Resources\TeacherMatiereCollection;
 use App\Http\Actions\Referentiel\FindReferentiel;
 
 class TeacherMatiereController extends Controller
@@ -35,7 +35,7 @@ class TeacherMatiereController extends Controller
      */
     public function index(Teacher $teacher)
     {
-        return new MatiereTeacherCollection(MatiereTeacher::where('teacher_id', $teacher->id)
+        return new TeacherMatiereCollection(TeacherMatiere::where('teacher_id', $teacher->id)
             ->with(['matiere.specialites', 'etat', 'level'])
             ->get());
     }
@@ -50,7 +50,7 @@ class TeacherMatiereController extends Controller
     {
         $matiereId = $request->get('matiere');
 
-        $teacherMatiere = MatiereTeacher::withTrashed()->where('teacher_id', $teacher->id)
+        $teacherMatiere = TeacherMatiere::withTrashed()->where('teacher_id', $teacher->id)
             ->where('matiere_id', $matiereId)
             ->first();
 
@@ -58,7 +58,7 @@ class TeacherMatiereController extends Controller
             return $this->conflictResponse("Vous enseignez déjà cette matière");
         }
 
-        $teacherMatiere = MatiereTeacher::firstOrCreate(
+        $teacherMatiere = TeacherMatiere::firstOrCreate(
             ['teacher_id' => $teacher->id, 'matiere_id' => $matiereId,],
             [
                 'etat_id' => $findReferentiel->byCodeEtat(CodeReferentiel::VALIDATING)->id
@@ -68,7 +68,7 @@ class TeacherMatiereController extends Controller
         $teacherMatiere->load('matiere.specialites');
         $teacherMatiere->load('etat');
 
-        return $this->createdResponse(new MatiereTeacherResource($teacherMatiere));
+        return $this->createdResponse(new TeacherMatiereResource($teacherMatiere));
     }
 
     /**

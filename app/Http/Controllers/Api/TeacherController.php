@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Classe;
 use App\Teacher;
-use App\MatiereTeacher;
+use App\TeacherMatiere;
 use App\Mail\UserIdentify;
 use App\Constants\CodeReferentiel;
 use App\Http\Actions\User\UserField;
@@ -42,7 +42,7 @@ class TeacherController extends Controller
      */
     public function index(ListTeacherRequest $request)
     {
-        $teachers = Teacher::whereHas('matiereTeachers', function ($q) use ($request) {
+        $teachers = Teacher::whereHas('TeacherMatieres', function ($q) use ($request) {
             $q->whereHas('matiere', function ($query) use ($request) {
                 $query->where('code', $request->get('matiere'));
             })->whereHas('level', function ($query) use ($request) {
@@ -85,7 +85,7 @@ class TeacherController extends Controller
 
     private function createTeacherMatiere($matiere, $teacherId)
     {
-        return MatiereTeacher::firstOrCreate(
+        return TeacherMatiere::firstOrCreate(
             [
                 'teacher_id' => $teacherId,
                 'matiere_id' => $matiere['code'],

@@ -19,7 +19,6 @@ class ClasseResource extends JsonResource
             'name' => $this->name,
             'abreviation' => $this->abreviation,
             'position' => $this->position,
-            'code' => $this->code,
             'hasFaq' => (string) $this->has_faq,
             'isExamClass' => (string) $this->is_exam_class,
             'level' => new ReferentielResource($this->whenLoaded('level')),

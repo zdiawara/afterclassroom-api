@@ -2,19 +2,21 @@
 
 namespace App\Http\Actions\User;
 
-use App\MatiereTeacher;
+use App\TeacherMatiere;
 use App\Http\Resources\TeacherResource;
 
 
-class UserDetail{
+class UserDetail
+{
 
-    public function auth(){
+    public function auth()
+    {
         $user = auth()->userOrFail();
-        if($user->isTeacher()){
-            $teacherMatieres = MatiereTeacher::where('teacher_id',$user->userable->id)
-                ->with(['matiere','etat'])
+        if ($user->isTeacher()) {
+            $teacherMatieres = TeacherMatiere::where('teacher_id', $user->userable->id)
+                ->with(['matiere', 'etat'])
                 ->get();
-            
+
             dd(new TeacherResource($user->userable));
         }
     }

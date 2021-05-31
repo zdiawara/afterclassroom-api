@@ -7,7 +7,6 @@ use App\Chapter;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\ChapterRequest;
 use App\Http\Resources\ChapterResource;
-use App\Http\Resources\TeacherResource;
 use App\Http\Actions\Chapter\ShowChapter;
 use App\Http\Actions\Checker\UserChecker;
 use App\Http\Requests\ListChapterRequest;

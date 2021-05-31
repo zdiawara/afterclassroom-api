@@ -10,26 +10,23 @@ class Student extends Model
 {
     protected $guarded = [];
 
+    protected $keyType = 'string';
+
+    public $incrementing = false;
+
     // Relation avec User
     public function user()
     {
         return $this->morphOne('App\User', 'userable');
     }
 
-    public function classe()
+    public function classes()
     {
-        return $this->belongsTo(Classe::class);
+        return $this->belongsToMany(Classe::class, 'student_classe');
     }
 
     public function teachers()
     {
         return $this->belongsToMany(Teacher::class)->withPivot('matiere_id');
-    }
-
-    public function setClasseIdAttribute($code)
-    {
-        if (!is_null($code)) {
-            $this->attributes['classe_id'] = Classe::where("code", $code)->firstOrFail()->id;
-        }
     }
 }

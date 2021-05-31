@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Actions\MatiereTeacher;
+namespace App\Http\Actions\TeacherMatiere;
 
 use App\ClasseMatiere;
 
@@ -11,7 +11,7 @@ class FindTeacherPrincipal
      */
     public function execute(string $matiere, string $classe)
     {
-        $matiereTeacher = ClasseMatiere::whereHas('matiere', function ($q) use ($matiere) {
+        $teacherMatiere = ClasseMatiere::whereHas('matiere', function ($q) use ($matiere) {
             $q->where('code', $matiere);
         })
             ->whereHas('classe', function ($q) use ($classe) {
@@ -19,8 +19,8 @@ class FindTeacherPrincipal
             })
             ->first();
 
-        if (isset($matiereTeacher)) {
-            return $matiereTeacher->teacher;
+        if (isset($teacherMatiere)) {
+            return $teacherMatiere->teacher;
         }
         return null;
     }

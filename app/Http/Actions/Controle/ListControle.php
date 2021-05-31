@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\DB;
 use App\Http\Actions\Content\DataAccess;
 use App\Http\Actions\Checker\UserChecker;
 use App\Http\Actions\Content\ReadContent;
-use App\Http\Actions\MatiereTeacher\FindTeacherPrincipal;
+use App\Http\Actions\TeacherMatiere\FindTeacherPrincipal;
 
 class ListControle
 {

@@ -9,12 +9,11 @@ use App\Exceptions\BadRequestException;
 class Controle extends Enseignement
 {
 
-    public function type()
-    {
-        return $this->belongsTo(Referentiel::class);
-    }
+    protected $keyType = 'string';
 
-    public function subject()
+    public $incrementing = false;
+
+    public function type()
     {
         return $this->belongsTo(Referentiel::class);
     }
@@ -24,23 +23,23 @@ class Controle extends Enseignement
         return $this->belongsTo(Referentiel::class);
     }
 
-    public function setTypeIdAttribute($code)
+    public function setTypeIdAttribute($id)
     {
-        if (!is_null($code)) {
-            $ref = Referentiel::where('code', $code)->where('type', TypeReferentiel::CONTROLE)->first();
-            if (\is_null($ref)) {
-                throw new BadRequestException("Referentiel incorrect " . $code);
+        if (!is_null($id)) {
+            $ref = Referentiel::findOrFail($id);
+            if ($ref->type != TypeReferentiel::CONTROLE) {
+                throw new BadRequestException("Le référentiel " . $id . " est incorrect");
             }
             $this->attributes['type_id'] = $ref->id;
         }
     }
 
-    public function setTrimestreIdAttribute($code)
+    public function setTrimestreIdAttribute($id)
     {
-        if (!is_null($code)) {
-            $ref = Referentiel::where('code', $code)->where('type', TypeReferentiel::TRIMESTRE)->first();
-            if (is_null($ref)) {
-                throw new BadRequestException("Le référentiel " . $code . " est incorrect");
+        if (!is_null($id)) {
+            $ref = Referentiel::findOrFail($id);
+            if ($ref->type != TypeReferentiel::TRIMESTRE) {
+                throw new BadRequestException("Le référentiel " . $id . " est incorrect");
             }
             $this->attributes['trimestre_id'] = $ref->id;
         }

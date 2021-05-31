@@ -4,7 +4,6 @@ namespace App\Http\Actions\Chapter;
 
 use App\Chapter;
 use App\Http\Actions\Queries;
-use Illuminate\Support\Facades\DB;
 use App\Http\Actions\Checker\UserChecker;
 use App\Http\Actions\Content\DataAccess;
 use App\Http\Actions\Content\ReadContent;
@@ -25,13 +24,13 @@ class ListChapter
 
     public function execute(string $teacher, array $params = [])
     {
-        $query = Chapter::whereHas('teacher.user', function ($q) use ($teacher) {
-            $q->where(DB::raw('lower(users.username)'), strtolower($teacher));
-        })->with(['specialite']);
+        $query = Chapter::where('teacher_id', $teacher)
+            ->with(['specialite']);
 
         if (!$this->userChecker->canReadInactive($teacher)) {
             $query = $query->where('is_active', 1);
         }
+
         $chapters = Queries::of($query)
             ->addMatiere($params)
             ->addSpecialite($params)

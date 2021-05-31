@@ -7,6 +7,11 @@ use Illuminate\Database\Eloquent\Model;
 
 class Classe extends Model
 {
+
+    protected $keyType = 'string';
+
+    public $incrementing = false;
+
     public function level()
     {
         return $this->belongsTo(Referentiel::class);
