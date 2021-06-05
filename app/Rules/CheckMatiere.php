@@ -15,7 +15,7 @@ class CheckMatiere implements Rule
 
     public function passes($attribute, $id)
     {
-        return Matiere::find($id) != null;
+        return isset($id) ? Matiere::find($id) != null : true;
     }
 
     public function message()

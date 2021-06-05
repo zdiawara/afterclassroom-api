@@ -9,8 +9,6 @@ use App\Referentiel;
 use App\TeacherMatiere;
 use App\Constants\CodeReferentiel;
 use App\Constants\TypeReferentiel;
-use App\Http\Resources\TeacherResource;
-use App\Http\Resources\TeacherMatiereResource;
 use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
@@ -20,6 +18,7 @@ class TeacherMatiereManagementTest extends TestCase
 
 
     /** @test **/
+    /** @ignore **/
     public function a_teacher_can_add_a_matiere_to_teach()
     {
         $this->withoutExceptionHandling();
@@ -40,6 +39,7 @@ class TeacherMatiereManagementTest extends TestCase
     }
 
     /** @test **/
+    /** @ignore **/
     public function a_teacher_can_not_add_matiere_to_teach_if_already_he_teach_it()
     {
         //$this->withoutExceptionHandling();
@@ -63,6 +63,7 @@ class TeacherMatiereManagementTest extends TestCase
     }
 
     /** @test **/
+    /** @ignore **/
     public function a_teacher_can_delete_her_matiere()
     {
         $this->withoutExceptionHandling();

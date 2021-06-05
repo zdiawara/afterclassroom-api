@@ -28,14 +28,16 @@ class ShowExercise
     public function execute(Exercise $exercise)
     {
         $chapter = $exercise->chapter;
-        $teacher = $chapter->teacher->user->username;
-        $this->enseignementChecker->checkCanReadInactive($exercise->is_enonce_active, $chapter->teacher->user->username);
-        $params = [
-            "matiere" => $chapter->matiere->code,
-            "classe" => $chapter->classe->code,
-        ];
+        $teacher = $chapter->teacher_id;
+
+        $this->enseignementChecker->checkCanReadInactive($exercise->is_enonce_active, $teacher);
+
+        $params = ["matiere" => $chapter->matiere_id, "classe" => $chapter->classe_id,];
+
         $canReadContent = $this->dataAccess->canReadContent($teacher, $params);
+
         $_exercise = $this->readContent->byExercise($exercise, $canReadContent);
+
         if (!$exercise->is_correction_active && !$this->userChecker->canReadInactive($teacher)) {
             $_exercise->correction = "Contenu desactivé pour le moment";
         }

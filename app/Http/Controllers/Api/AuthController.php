@@ -2,28 +2,24 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Classe;
 use App\TeacherMatiere;
-use App\Http\Actions\Classe\ListClasseMatiere;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\StudentResource;
 use App\Http\Resources\TeacherResource;
 use Symfony\Component\HttpFoundation\Response;
-use App\Http\Actions\Student\ListStudentTeacher;
+use App\Http\Actions\Student\StudentDetail;
 
 class AuthController extends Controller
 {
-    private $listStudentTeacher;
 
     /**
      * Create a new AuthController instance.
      *
      * @return void
      */
-    public function __construct(ListStudentTeacher $listStudentTeacher)
+    public function __construct()
     {
         $this->middleware('auth:api', ['except' => ['login']]);
-        $this->listStudentTeacher = $listStudentTeacher;
     }
 
     /**
@@ -50,7 +46,7 @@ class AuthController extends Controller
      *
      * @return \Illuminate\Http\JsonResponse
      */
-    public function me(ListClasseMatiere $listClasseMatiere)
+    public function me(StudentDetail $studentDetail)
     {
         $user = auth()->userOrFail();
         $user->load('gender');
@@ -64,13 +60,7 @@ class AuthController extends Controller
             return new TeacherResource($teacher);
         }
         if ($user->isStudent()) {
-            $student = $user->userable;
-            $student->load(['classe.level']);
-            $student['matieres'] = $listClasseMatiere->byClasse($student->classe);
-
-            $student['classes'] = Classe::with(['level'])->where('position', '<=', $student->classe->position)->get();
-            $student['student_teachers'] = $this->listStudentTeacher->execute($student);
-            return new StudentResource($student);
+            return new StudentResource($studentDetail->execute($user->userable));
         }
         return response()->json(auth()->user());
     }

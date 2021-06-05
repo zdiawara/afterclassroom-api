@@ -2,7 +2,6 @@
 
 namespace Tests\Feature\Student;
 
-use App\Classe;
 use App\Student;
 use Tests\TestCase;
 use Symfony\Component\HttpFoundation\Response;
@@ -22,7 +21,7 @@ class StudentManagementTest extends TestCase
 
         $response
             ->assertStatus(Response::HTTP_CREATED);
-            //->assertJsonFragment($this->decodeResource(new TeacherResource($teacher)));
+        //->assertJsonFragment($this->decodeResource(new TeacherResource($teacher)));
     }
 
 
@@ -34,25 +33,23 @@ class StudentManagementTest extends TestCase
         $this->createStudent();
 
         $student = Student::first();
-        
+
         $data = [
             "firstname" => "Prenom 1",
             "username" => 'zdiawara',
-            "classe" => \factory(Classe::class)->create()->id
         ];
-        
+
         $response = $this->actingAs($student->user)->put(
-            route('students.update',["student"=>$student->id]),
+            route('students.update', ["student" => $student->id]),
             $data
         );
 
         $response
             ->assertStatus(Response::HTTP_CREATED);
-        
-        $student = Student::first();
-        $this->assertTrue($student->user->firstname==$data['firstname']);
-        $this->assertTrue($student->user->username==$data['username']);
-        $this->assertTrue($student->classe->id==$data['classe']);
+
+        $student = Student::find($student->id);
+        $this->assertTrue($student->user->firstname == $data['firstname']);
+        $this->assertTrue($student->user->username == $data['username']);
     }
 
     /** @test **/
@@ -61,15 +58,12 @@ class StudentManagementTest extends TestCase
         //$this->withoutExceptionHandling();
 
         $this->createStudent(2);
-        
-        $response = $this->actingAs(Student::find(2)->user)->put(
-            route('students.update',["student"=>Student::first()->id]),
-            ["lastname"=>"lastname 1"]
+        $students = Student::all();
+        $response = $this->actingAs($students[0]->user)->put(
+            route('students.update', ["student" =>  $students[1]->id]),
+            ["lastname" => "lastname 1"]
         );
 
         $response->assertStatus(Response::HTTP_UNAUTHORIZED);
-    
     }
-
-
 }

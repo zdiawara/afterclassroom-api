@@ -40,7 +40,7 @@ class ManageUser
     {
         $user = new User($this->buildUserFields($request), ['username' => $username]);
 
-        $user->username = $this->manageIdentify->buildIdentify();
+        $user->username = $username;
 
         $user->avatar = $request->has('avatar')
             ?   $this->uploadFile->image($request->file('avatar'))

@@ -24,7 +24,7 @@ class ListQuestion
 
     public function byChapter(Chapter $chapter)
     {
-        $teacher = $chapter->teacher->user->username;
+        $teacher = $chapter->teacher_id;
 
         $query = $chapter->questions();
 
@@ -33,8 +33,8 @@ class ListQuestion
         }
 
         $canReadQuestion = $this->dataAccess->canReadQuestion($teacher, [
-            "matiere" => $chapter->matiere->code,
-            "classe" => $chapter->classe->code
+            "matiere" => $chapter->matiere_id,
+            "classe" => $chapter->classe_id
         ]);
 
         $questions = Queries::of($query)

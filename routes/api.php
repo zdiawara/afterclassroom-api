@@ -40,7 +40,10 @@ Route::apiResource('teachers.matieres', "Api\TeacherMatiereController");
 
 // Student
 Route::apiResource('students', "Api\StudentController");
-Route::apiResource('students.teachers', "Api\StudentTeacherController");
+Route::apiResource('students.classes', "Api\StudentClasseController");
+
+// Subscription
+Route::apiResource('subscriptions', "Api\SubscriptionController");
 
 // Chapter
 Route::apiResource('chapters', "Api\ChapterController");

@@ -32,7 +32,7 @@ class ReadContent
 
     public function byControle(Controle $controle, bool $canReadContent)
     {
-        if ($controle->type->code === CodeReferentiel::EXAMEN) {
+        if ($controle->type_id === CodeReferentiel::EXAMEN) {
             if (!$canReadContent && !$controle->is_public) {
                 $controle->correction = $this->defaultContent;
             }

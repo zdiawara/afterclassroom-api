@@ -19,8 +19,9 @@ class StudentRequest extends UserRequest
         $rules = [
             "classe" => ['required', new CheckClasse]
         ];
+
         if ($this->student) {
-            $this->userId = $this->student->username;
+            $this->userId = $this->student->id;
         }
         return $this->makeRules(array_merge(parent::rules(), $rules));
     }

@@ -4,15 +4,16 @@ namespace App\Http\Actions\Content;
 
 use App\Constants\CodeReferentiel;
 use App\Http\Actions\Student\FindStudentTeacher;
+use App\Http\Actions\Subscription\HasSubscription;
 
 class DataAccess
 {
 
-    private FindStudentTeacher $findStudentTeacher;
+    private HasSubscription $hasSubscription;
 
-    public function __construct(FindStudentTeacher $findStudentTeacher)
+    public function __construct(HasSubscription $hasSubscription)
     {
-        $this->findStudentTeacher = $findStudentTeacher;
+        $this->hasSubscription = $hasSubscription;
     }
 
     public function canReadContent(string $teacherId, array $paramsIds = [])
@@ -38,10 +39,12 @@ class DataAccess
         }
         $_params = array_merge(
             $paramsIds,
-            ["teacher" => $teacherId, 'enseignement' => $enseignement]
+            ["teacher" => $teacherId, 'enseignement' => $enseignement,]
         );
-        if ($user->isStudent() && $this->findStudentTeacher->byId($user, $_params) != null) {
-            return true;
+        if ($user->isStudent()) {
+            return $this->hasSubscription->execute(
+                array_merge($_params, ['student' => $user->username])
+            );
         }
         return false;
     }

@@ -20,6 +20,7 @@ class CreateTeacherMatieresTable extends Migration
             $table->string('level_id');
             $table->softDeletes();
             $table->timestamps();
+            $table->unique(['teacher_id', 'matiere_id']);
             $table->foreign('matiere_id')->references('id')->on('matieres');
             $table->foreign('teacher_id')->references('id')->on('teachers');
             $table->foreign('etat_id')->references('id')->on('referentiels');

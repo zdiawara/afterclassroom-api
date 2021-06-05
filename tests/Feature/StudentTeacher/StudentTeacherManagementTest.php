@@ -3,11 +3,15 @@
 namespace Tests\Feature\StudentTeacher;
 
 use App\Classe;
+use App\Matiere;
 use App\Student;
 use App\Teacher;
 use Tests\TestCase;
+use App\Referentiel;
 use App\StudentTeacher;
+use App\TeacherMatiere;
 use App\Constants\CodeReferentiel;
+use App\Constants\TypeReferentiel;
 use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
@@ -17,74 +21,39 @@ class StudentTeacherManagementTest extends TestCase
 
 
     /** @test **/
-    public function a_student_can_add_a_teacher()
+    public function a_student_can_follow_a_teacher()
     {
         $this->withoutExceptionHandling();
 
-        $this->createStudent();
+        $classe = factory(Classe::class)->create();
+        $this->makeStudent($classe);
+        $this->createTeacher();
 
-        $studentTeacher = factory(StudentTeacher::class)->make();
         $student = Student::first();
-        $student->update([
-            'classe_id' => $studentTeacher->classe
-        ]);
+
+        $teacher = Teacher::first();
+        $matiereId = $teacher->matieres->random()->id;
+        $classeId = $classe->id;
+        $enseignement = CodeReferentiel::BASIC;
 
         $response = $this->actingAs($student->user)
             ->post(
                 route('students.teachers.store', ['student' => $student->id]),
-                $studentTeacher->toArray()
+                [
+                    'teacher' => $teacher->id,
+                    'matiere' => $matiereId,
+                    'classe' => $classeId,
+                    'enseignement' => $enseignement,
+                ]
             );
 
         $response
             ->assertStatus(Response::HTTP_CREATED);
 
         $created = StudentTeacher::first();
-        $this->assertTrue($created->teacher->id == $studentTeacher->teacher);
-        $this->assertTrue($created->classe->id == $studentTeacher->classe);
-        $this->assertTrue($created->matiere->id == $studentTeacher->matiere);
-        $this->assertTrue($created->collegeYear->etat->code == CodeReferentiel::IN_PROGRESS);
-    }
-
-    /** @test **/
-    public function a_teacher_can_not_add_matiere_to_teach_if_already_he_teach_it()
-    {
-        //$this->withoutExceptionHandling();
-
-        $teacher = factory(Teacher::class)->create();
-
-        $matiere = factory(Matiere::class)->create();
-
-        $teacher->matieres()->attach($matiere->id, [
-            "etat_id" => factory(Referentiel::class)->create(['type' => TypeReferentiel::ETAT])->id,
-            "justificatif" => "test.pdf"
-        ]);
-
-        $teacherMatiere = factory(TeacherMatiere::class)->make(["matiere" => $matiere->id]);
-
-        $response = $this->actingAs($teacher->user)
-            ->post(route('teachers.matieres.store', ['teacher' => $teacher->id]), $teacherMatiere->toArray());
-
-        $response
-            ->assertStatus(Response::HTTP_CONFLICT);
-    }
-
-    /** @test **/
-    public function a_teacher_can_delete_her_matiere()
-    {
-        $this->withoutExceptionHandling();
-
-        $teacher = factory(Teacher::class)->create();
-        $matiere = factory(Matiere::class)->create();
-
-        $teacher->matieres()->attach($matiere->id, [
-            "etat_id" => factory(Referentiel::class)->create(['type' => TypeReferentiel::ETAT])->id,
-            "justificatif" => "test.pdf"
-        ]);
-
-        $response = $this->actingAs($teacher->user)
-            ->delete(route('teachers.matieres.destroy', ['teacher' => $teacher->id, 'matiere' => $matiere->id]));
-
-        $response
-            ->assertStatus(Response::HTTP_NO_CONTENT);
+        $this->assertTrue($created->teacher_id == $teacher->id);
+        $this->assertTrue($created->classe_id == $classeId);
+        $this->assertTrue($created->matiere_id == $matiereId);
+        $this->assertTrue($created->collegeYear->etat_id == CodeReferentiel::IN_PROGRESS);
     }
 }

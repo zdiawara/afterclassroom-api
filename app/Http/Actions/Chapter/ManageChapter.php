@@ -28,7 +28,7 @@ class ManageChapter
         $this->enseignementChecker->canCreate($chapter);
 
         // verifie que le teacher peut enseigner la matiere
-        $this->teacherMatiereChecker->canTeach($chapter->teacher, $chapter->matiere, true);
+        $this->teacherMatiereChecker->canTeach($chapter->teacher_id, $chapter->matiere_id, true);
 
         $lastChapter = Chapter::where('teacher_id', $chapter->teacher_id)
             ->where('matiere_id', $chapter->matiere_id)
@@ -49,12 +49,10 @@ class ManageChapter
         $this->enseignementChecker->canUpdate($chapter);
 
         // Recupère la matiere pour verifier que le prof peut l'enseigner
-        $matiere = isset($fields['matiere_id'])
-            ? Matiere::where('code', $fields['matiere_id'])->firstOrFail()
-            : $chapter->matiere;
+        $matiereId = isset($fields['matiere_id']) ? $fields['matiere_id'] : $chapter->matiere_id;
 
         // verifie que le teacher peut enseigner la matiere
-        $this->teacherMatiereChecker->canTeach($chapter->teacher, $matiere, !isset($fields['is_active']));
+        $this->teacherMatiereChecker->canTeach($chapter->teacher_id, $matiereId, !isset($fields['is_active']));
 
         $chapter->update($fields);
 

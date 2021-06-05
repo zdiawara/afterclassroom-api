@@ -22,6 +22,7 @@ use App\Http\Actions\Content\DocumentPlan;
 use App\Http\Actions\User\ManageIdentify;
 use App\TeacherMatiere;
 use App\Question;
+use App\Subscription;
 
 class DatabaseSeeder extends Seeder
 {
@@ -46,13 +47,13 @@ class DatabaseSeeder extends Seeder
         $t1 = $this->createTeacher('Yao', 'Lovie', 'lovie.yao@test.com', ['maths'], $lycee);
         $this->createTeacher('Alassane', 'Zerbo', 'zerbo.alassane@test.com',  ['maths'], $lycee);
 
-        $t2 = $this->createTeacher('Souley', 'Drabo', 'souley.drabo@test.com', ['physique_chimie', 'maths'], $lycee);
-        $t4 = $this->createTeacher('Joseph', 'Ibara', 'ibara.joseph@test.com', ['physique_chimie'], $lycee);
+        $t2 = $this->createTeacher('Souley', 'Drabo', 'souley.drabo@test.com', ['pc', 'maths'], $lycee);
+        $t4 = $this->createTeacher('Joseph', 'Ibara', 'ibara.joseph@test.com', ['pc'], $lycee);
 
         $this->createTeacher('Sebastian', 'Mampassi', 'mampassi.sebastian@test.com', ['svt'], $lycee);
         $this->createTeacher('Baobab', 'Sidibé', 'sidibe.baobab@test.com',  ['francais'], $lycee);
-        $this->createTeacher('Nafa', 'Traoré', 'traore.nafa@test.com',  ['histoire_geographie'], $college);
-        $this->createTeacher('Charles', 'Sanou', 'sanou.charles@test.com', ['histoire_geographie'], $lycee);
+        $this->createTeacher('Nafa', 'Traoré', 'traore.nafa@test.com',  ['hg'], $college);
+        $this->createTeacher('Charles', 'Sanou', 'sanou.charles@test.com', ['hg'], $lycee);
         $this->createTeacher('Jean', 'Descartes', 'descartes.jean@test.com', ['philosophie'], $lycee);
         $this->createTeacher('Ouédraogo', 'Jean', 'ouedraogo.jean@test.com', ['philosophie'], $lycee);
         $this->createTeacher('Moussa', 'Coulibaly', 'coulibaly.moussa@test.com', ['anglais'], $college);
@@ -63,8 +64,8 @@ class DatabaseSeeder extends Seeder
         $this->createStudent('Alassane', 'Traoré', 'traore.alassane@test.com', 'troisieme');
         $this->createStudent('Jean', 'Somé', 'some.jean@test.com', 'sixieme');
 
-        $this->createStudentTeacher($s1, $t1, 'maths', 'terminale_d');
-        $this->createStudentTeacher($s1, $t4, 'physique_chimie', 'terminale_d');
+        $this->createSubscription($s1, $t1, 'maths', 'terminale_d');
+        $this->createSubscription($s1, $t4, 'pc', 'terminale_d');
 
         $this->generateClasseMatieres();
 
@@ -77,8 +78,8 @@ class DatabaseSeeder extends Seeder
     {
         $base = ['maths', 'francais', 'anglais'];
 
-        $matiere_6_5 =  collect($base)->push('svt', 'histoire_geographie',)->all();
-        $matiere_4_3 = collect($matiere_6_5)->push('physique_chimie')->all();
+        $matiere_6_5 =  collect($base)->push('svt', 'hg',)->all();
+        $matiere_4_3 = collect($matiere_6_5)->push('pc')->all();
         $matiere_c_d = collect($matiere_4_3)->push('philosophie')->all();
         $matiere_a = collect($base)->push('allemand')->push('philosophie')->all();
 
@@ -95,8 +96,8 @@ class DatabaseSeeder extends Seeder
                 'terminale_c' => $matiere_c_d,
                 'terminale_d' => $matiere_c_d,
 
-                'seconde_a' => collect($matiere_a)->push('physique_chimie', 'svt'),
-                'premiere_a' => collect($matiere_a)->push('physique_chimie', 'svt'),
+                'seconde_a' => collect($matiere_a)->push('pc', 'svt'),
+                'premiere_a' => collect($matiere_a)->push('pc', 'svt'),
                 'terminale_a' => $matiere_a
             ],
         ];
@@ -139,17 +140,18 @@ class DatabaseSeeder extends Seeder
                     $chapter->save();
 
                     factory(Exercise::class, rand(0, 5))->make()->each(function ($exercise) use ($chapter) {
-                        $exercise->chapter_id = $chapter->id;
-                        $exercise->is_enonce_active = $exercise['enonce']['active'];
-                        $exercise->enonce = $exercise['enonce']['data'];
-                        $exercise->is_correction_active = $exercise['correction']['active'];
-                        $exercise->correction = $exercise['correction']['data'];
-                        $exercise->type_id = Referentiel::where('type', TypeReferentiel::EXERCISE)
+                        $newExercise = new Exercise();
+                        $newExercise->chapter_id = $chapter->id;
+                        $newExercise->is_enonce_active = $exercise['enonce']['active'];
+                        $newExercise->enonce = $exercise['enonce']['data'];
+                        $newExercise->is_correction_active = $exercise['correction']['active'];
+                        $newExercise->correction = $exercise['correction']['data'];
+                        $newExercise->type_id = Referentiel::where('type', TypeReferentiel::EXERCISE)
                             ->get()
                             ->random()
                             ->id;
 
-                        $exercise->save();
+                        $newExercise->save();
                     });
                 });
 
@@ -236,16 +238,16 @@ class DatabaseSeeder extends Seeder
         return null;
     }
 
-    private function createStudentTeacher($student, $teacher, $matiere, $classe)
+    private function createSubscription($student, $teacher, $matiere, $classe)
     {
-        $st = new StudentTeacher();
-        $st->matiere_id = $matiere;
-        $st->classe_id = $classe;
-        $st->student_id = $student->id;
-        $st->teacher_id = $teacher->id;
-        $st->enseignement_id = Referentiel::find(CodeReferentiel::BASIC)->id;
-        $st->college_year_id = CollegeYear::first()->id;
-        $st->save();
+        $subcription = new Subscription();
+        $subcription->matiere_id = $matiere;
+        $subcription->classe_id = $classe;
+        $subcription->student_id = $student->id;
+        $subcription->teacher_id = $teacher->id;
+        $subcription->enseignement_id = CodeReferentiel::BASIC;
+        $subcription->college_year_id = CollegeYear::first()->id;
+        $subcription->save();
     }
 
     private function createReferentiels()
@@ -283,15 +285,14 @@ class DatabaseSeeder extends Seeder
         $this->createReferentiel('FAQ', CodeReferentiel::FAQ, TypeReferentiel::ENSEIGNEMENT, 2);
         $this->createReferentiel('Sujet d\'examen', CodeReferentiel::EXAM_SUBJECT, TypeReferentiel::ENSEIGNEMENT, 3);
 
-
-        $ref = $this->createReferentiel('En cours', CodeReferentiel::IN_PROGRESS, TypeReferentiel::ETAT_COLLEGE_YEAR, 1);
-        $this->createReferentiel('Terminé', CodeReferentiel::FINISHED, TypeReferentiel::ETAT_COLLEGE_YEAR, 2);
-
         $year = date('Y', strtotime(now()));
+
+        $started = new DateTime($year - 1 . '-08-01');
         CollegeYear::create([
             'name' => ($year - 1) . '-' . $year,
             'id' => $year,
-            'etat_id' => $ref->id
+            'started_at' => date('Y-m-d H:m:s', $started->getTimestamp()),
+            'finished_at' => date('Y-m-d H:m:s', $started->add(new DateInterval('P1Y'))->getTimestamp())
         ]);
     }
 
@@ -348,7 +349,7 @@ class DatabaseSeeder extends Seeder
 
         $maths = $this->generateMatiere('Mathématiques', 'maths', 'Maths', 1);
 
-        $pc = $this->generateMatiere('Physique-Chimie', 'physique_chimie', 'PC', 2);
+        $pc = $this->generateMatiere('Physique-Chimie', 'pc', 'PC', 2);
         $this->generateSpecialite('Physique', 'physique', $pc);
         $this->generateSpecialite('Chimie', 'chimie', $pc);
 
@@ -362,7 +363,7 @@ class DatabaseSeeder extends Seeder
 
         //$histoire = $this->generateMatiere('Histoire','histoire','Hist');
 
-        $hg = $this->generateMatiere('Histoire-Géographie', 'histoire_geographie', 'HG', 7);
+        $hg = $this->generateMatiere('Histoire-Géographie', 'hg', 'HG', 7);
         $this->generateSpecialite('Géographie', 'geographie', $hg);
         $this->generateSpecialite('Histoire', 'histoire', $hg);
 
@@ -443,6 +444,12 @@ class DatabaseSeeder extends Seeder
         ]);
 
         $student->user()->save($user);
+        $student->classes()->attach($classe, [
+            'college_year_id' => CollegeYear::whereDate('started_at', '<=', date("Y-m-d"))
+                ->whereDate('finished_at', '>=', date("Y-m-d"))
+                ->firstOrFail()->id,
+            'changed' => 1
+        ]);
         return $student;
     }
 }

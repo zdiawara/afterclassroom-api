@@ -17,21 +17,13 @@ class SearchQuestion
         $this->userChecker = $userChecker;
     }
 
-    public function byTeacher(string $teacher, array $params = [])
+    public function byTeacher(string $teacherId, array $params = [])
     {
 
-        $query = Question::whereHas('chapter', function ($q) use ($teacher, $params) {
-
-            $q->whereHas('matiere', function ($queryChapter)  use ($params) {
-                $queryChapter->where('code', $params['matiere']);
-            })->whereHas('classe', function ($queryChapter)  use ($params) {
-                $queryChapter->where('code', $params['classe']);
-            })->whereHas('teacher.user', function ($queryChapter) use ($teacher) {
-                $queryChapter->where(
-                    DB::raw('lower(users.username)'),
-                    strtolower($teacher)
-                );
-            });
+        $query = Question::whereHas('chapter', function ($q) use ($teacherId, $params) {
+            $q->where('matiere_id', $params['matiere'])
+                ->where('classe_id', $params['classe'])
+                ->where('teacher_id', $teacherId);
         });
 
         if (isset($params['search'])) {
@@ -50,17 +42,9 @@ class SearchQuestion
 
         $canReadInactive = $this->userChecker->canReadInactive($teacher);
 
-        $query = Chapter::whereHas('matiere', function ($queryChapter)  use ($params) {
-            $queryChapter->where('code', $params['matiere']);
-        })->whereHas('classe', function ($queryChapter)  use ($params) {
-            $queryChapter->where('code', $params['classe']);
-        })->whereHas('teacher.user', function ($queryChapter) use ($teacher) {
-            $queryChapter->where(DB::raw('lower(users.username)'), strtolower($teacher));
-        })->withCount(['questions' => function ($query) use ($canReadInactive) {
-            if (!$canReadInactive) {
-                $query->where('is_active', 1);
-            }
-        }])
+        $query = Chapter::where('matiere_id', $params['matiere'])
+            ->where('classe_id', $params['classe'])
+            ->where('teacher_id', $teacher)
             ->with(['classe', 'matiere', 'specialite']);
 
         if (!$canReadInactive) {

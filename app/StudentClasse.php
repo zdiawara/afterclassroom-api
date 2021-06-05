@@ -23,25 +23,4 @@ class StudentClasse extends Model
     {
         return $this->belongsTo(CollegeYear::class);
     }
-
-    // public function setStudentIdAttribute($id)
-    // {
-    //     if (!is_null($id)) {
-    //         $this->attributes['student_id'] = Student::findOrFail($id)->id;
-    //     }
-    // }
-
-    // public function setClasseIdAttribute($id)
-    // {
-    //     if (!is_null($id)) {
-    //         $this->attributes['classe_id'] = Classe::findOrFail($id)->id;
-    //     }
-    // }
-
-    // public function setCollegeYearIdAttribute($id)
-    // {
-    //     if (!is_null($id)) {
-    //         $this->attributes['college_year_id'] = CollegeYear::findOrFail($id)->id;
-    //     }
-    // }
 }

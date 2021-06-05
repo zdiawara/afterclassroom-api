@@ -3,10 +3,9 @@
 namespace App\Http\Resources;
 
 use App\Enums\UserRole;
-use App\TeacherMatiere;
+
 use App\Http\Resources\UserResource;
 use App\Http\Resources\TeacherMatiereResource;
-use Illuminate\Http\Resources\Json\JsonResource;
 
 class TeacherResource extends UserResource
 {

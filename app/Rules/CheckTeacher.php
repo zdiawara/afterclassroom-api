@@ -13,9 +13,9 @@ class CheckTeacher implements Rule
         //
     }
 
-    public function passes($attribute, $id)
+    public function passes($attribute, $username)
     {
-        return Teacher::find($id) != null;
+        return isset($username) ? Teacher::find($username) != null : true;
     }
 
     public function message()

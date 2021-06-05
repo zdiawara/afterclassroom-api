@@ -3,9 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Student;
-use App\CollegeYear;
 use App\Mail\UserIdentify;
-use App\Constants\CodeReferentiel;
 use Illuminate\Support\Facades\DB;
 use App\Http\Actions\User\UserField;
 use App\Http\Controllers\Controller;
@@ -16,6 +14,7 @@ use App\Http\Resources\StudentResource;
 use App\Http\Actions\Checker\UserChecker;
 use App\Http\Actions\User\ManageIdentify;
 use App\Http\Actions\Classe\ListClasseMatiere;
+use App\Http\Actions\CollegeYear\CollegeYearInProgress;
 
 class StudentController extends Controller
 {
@@ -54,8 +53,12 @@ class StudentController extends Controller
     }
 
 
-    public function store(StudentRequest $request,  ManageUser $manageUser,  ManageIdentify $manageIdentify)
-    {
+    public function store(
+        StudentRequest $request,
+        ManageUser $manageUser,
+        ManageIdentify $manageIdentify,
+        CollegeYearInProgress $collegeYearInProgress
+    ) {
 
         DB::beginTransaction();
 
@@ -66,8 +69,7 @@ class StudentController extends Controller
         $student->user()->save($user = $manageUser->create($request, $username));
 
         $student->classes()->attach($request->get('classe'), [
-            'college_year_id' => CollegeYear::where('etat_id', CodeReferentiel::IN_PROGRESS)
-                ->firstOrFail()->id,
+            'college_year_id' => $collegeYearInProgress->execute()->id,
             'changed' => 1
         ]);
 
@@ -99,7 +101,7 @@ class StudentController extends Controller
         $this->loadDependences($student);
 
         if ($request->has("classe")) {
-            $student["matieres"] = $listClasseMatiere->byClasse($student->classe);
+            $student["matieres"] = $listClasseMatiere->byClasse($request->has("classe"));
         }
 
         return $this->createdResponse(new StudentResource($student));

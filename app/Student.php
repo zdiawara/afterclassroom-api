@@ -22,11 +22,13 @@ class Student extends Model
 
     public function classes()
     {
-        return $this->belongsToMany(Classe::class, 'student_classe');
+        return $this->belongsToMany(Classe::class, 'student_classe')
+            ->withPivot('classe_id', 'college_year_id')
+            ->withTimestamps();
     }
 
     public function teachers()
     {
-        return $this->belongsToMany(Teacher::class)->withPivot('matiere_id');
+        return $this->belongsToMany(Teacher::class)->withPivot('matiere_id')->withTimestamps();
     }
 }

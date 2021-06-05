@@ -15,6 +15,7 @@ use App\Http\Requests\TeacherMatiereRequest;
 use App\Http\Resources\TeacherMatiereResource;
 use App\Http\Resources\TeacherMatiereCollection;
 use App\Http\Actions\Referentiel\FindReferentiel;
+use App\Referentiel;
 
 class TeacherMatiereController extends Controller
 {
@@ -40,13 +41,8 @@ class TeacherMatiereController extends Controller
             ->get());
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(TeacherMatiereRequest $request, Teacher $teacher, FindReferentiel $findReferentiel)
+
+    public function store(TeacherMatiereRequest $request, Teacher $teacher)
     {
         $matiereId = $request->get('matiere');
 
@@ -59,9 +55,12 @@ class TeacherMatiereController extends Controller
         }
 
         $teacherMatiere = TeacherMatiere::firstOrCreate(
-            ['teacher_id' => $teacher->id, 'matiere_id' => $matiereId,],
             [
-                'etat_id' => $findReferentiel->byCodeEtat(CodeReferentiel::VALIDATING)->id
+                'teacher_id' => $teacher->id,
+                'matiere_id' => $matiereId,
+            ],
+            [
+                'etat_id' => CodeReferentiel::VALIDATING
             ]
         );
 

@@ -33,7 +33,6 @@ class EnseignementChecker extends Checker
             } else {
                 $teacherId = $model->teacher_id;
             }
-
             if ($teacherId == $user->userable_id) {
                 return true;
             }

@@ -55,14 +55,6 @@ class Queries
         return $this;
     }
 
-    private function whereHas($relation, $code)
-    {
-        $this->query = $this->query->whereHas($relation, function ($q) use ($code) {
-            $q->where('code', $code);
-        });
-        return $this;
-    }
-
     public function getQuery()
     {
         return $this->query;

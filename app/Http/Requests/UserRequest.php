@@ -22,7 +22,10 @@ class UserRequest extends CustumRequest
             'firstname' => 'required|max:50|min:2',
             'lastname' => 'required|max:50|min:2',
             'email' => ['required', 'max:50', 'email', Rule::unique('users')->where(function ($query) {
-                return $query->where('username_', $this->userId);
+                if (isset($this->userId)) {
+                    return $query->where('username', '<>', $this->userId);
+                }
+                return $query;
             })],
 
             'password' => 'required|min:6',

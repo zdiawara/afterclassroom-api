@@ -14,6 +14,11 @@ $factory->define(Teacher::class, function () {
         collect(factory(Referentiel::class)->make()->toArray())->except(['id', 'type'])->all()
     );
 
+    Referentiel::firstOrCreate(
+        ["id" => CodeReferentiel::VALIDATED, "type" => TypeReferentiel::ETAT],
+        factory(Referentiel::class)->make()->toArray()
+    );
+
     factory(Matiere::class, rand(2, 3))->create();
 
     $level = Referentiel::firstOrCreate(
@@ -23,7 +28,7 @@ $factory->define(Teacher::class, function () {
 
     return [
         'matieres' => Matiere::all()->map(function ($matiere) use ($level) {
-            return ['id' => $matiere->id, 'level' => $level->id];
+            return ['code' => $matiere->id, 'level' => $level->id];
         })->all()
     ];
 });
@@ -32,7 +37,7 @@ $factory->afterCreating(Teacher::class, function ($teacher) {
     $teacher->user()->save(factory(User::class)->make());
 
     Referentiel::firstOrCreate(
-        ["code" => CodeReferentiel::VALIDATED, "type" => TypeReferentiel::ETAT],
-        collect(factory(Referentiel::class)->make()->toArray())->except(['code', 'type'])->all()
+        ["id" => CodeReferentiel::VALIDATED, "type" => TypeReferentiel::ETAT],
+        collect(factory(Referentiel::class)->make()->toArray())->except(['id', 'type'])->all()
     );
 });

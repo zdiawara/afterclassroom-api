@@ -12,17 +12,17 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 class UserChekerTest extends TestCase
 {
     use RefreshDatabase;
-    
-    
+
+
     /** @test **/
     public function a_user_can_update_her_profil()
     {
-        factory(Teacher::class)->create();
 
+        $this->createTeacher();
         $teacher = Teacher::first();
-        
+
         $this->actingAs($teacher->user);
-        
+
         $canEdit = (new UserChecker)->canUpdate($teacher);
 
         $this->assertTrue($canEdit);
@@ -30,12 +30,16 @@ class UserChekerTest extends TestCase
 
     /** @test **/
     public function a_user_can_not_update_an_other_profil()
-    {   
-        $this->actingAs(factory(Teacher::class)->create()->user);
+    {
+        $this->createTeacher();
+        $this->createTeacher();
+
+        $teachers = Teacher::all();
+
+        $this->actingAs($teachers[0]->user);
 
         $this->expectException(PrivilegeException::class);
 
-        (new UserChecker)->canUpdate(factory(Teacher::class)->create());
+        (new UserChecker)->canUpdate($teachers[1]);
     }
-
 }

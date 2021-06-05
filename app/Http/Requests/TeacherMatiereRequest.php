@@ -3,11 +3,11 @@
 namespace App\Http\Requests;
 
 use App\Http\Requests\CustumRequest;
-use Illuminate\Foundation\Http\FormRequest;
+use App\Rules\CheckMatiere;
 
 class TeacherMatiereRequest extends CustumRequest
 {
-    
+
 
     /**
      * Get the validation rules that apply to the request.
@@ -17,7 +17,7 @@ class TeacherMatiereRequest extends CustumRequest
     public function rules()
     {
         $rules = [
-            'matiere' => 'required',
+            'matiere' => ['required', new CheckMatiere],
             //'justificatif' => 'required|mimes:png,jpeg,pdf'
         ];
         return $this->makeRules($rules);

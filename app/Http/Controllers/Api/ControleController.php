@@ -47,7 +47,7 @@ class ControleController extends Controller
         $this->enseignementChecker->canCreate($controle);
 
         // verifie que le teacher peut enseigner la matiere
-        $this->teacherMatiereChecker->canTeach($controle->teacher, $controle->matiere, true);
+        $this->teacherMatiereChecker->canTeach($controle->teacher_id, $controle->matiere_id, true);
 
         $controle->save();
 
@@ -69,10 +69,10 @@ class ControleController extends Controller
         );
 
         // Recupère la matiere pour verifier que le prof peut l'enseigner
-        $matiere = isset($fields['matiere_id']) ? Matiere::find($fields['matiere_id']) : $controle->matiere;
+        $matiereId = isset($fields['matiere_id']) ? Matiere::find($fields['matiere_id']) : $controle->matiere_id;
 
         // verifie que le teacher peut enseigner la matiere
-        $this->teacherMatiereChecker->canTeach($controle->teacher, $controle->matiere, !(isset($fields['active_correction']) || isset($fields['active_enonce'])));
+        $this->teacherMatiereChecker->canTeach($controle->teacher_id, $matiereId, !(isset($fields['active_correction']) || isset($fields['active_enonce'])));
 
         $controle->update($fields);
 
@@ -98,7 +98,7 @@ class ControleController extends Controller
 
     private function loadDependences(Controle $controle)
     {
-        $controle->load(['matiere', 'teacher', 'subject', 'classe', 'type', 'trimestre']);
+        $controle->load(['matiere', 'teacher', 'classe', 'type', 'trimestre']);
     }
 
     /**

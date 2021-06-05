@@ -14,10 +14,11 @@ class CreateStudentClasseTable extends Migration
     public function up()
     {
         Schema::create('student_classe', function (Blueprint $table) {
+            $table->id();
             $table->string('student_id');
             $table->string('classe_id');
             $table->year('college_year_id');
-            $table->integer('changed')->default(1);
+            $table->integer('changed')->default(1)->min(1);
             $table->timestamps();
 
             $table->unique(['student_id', 'college_year_id']);

@@ -8,7 +8,6 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\ChapterRequest;
 use App\Http\Resources\ChapterResource;
 use App\Http\Actions\Chapter\ShowChapter;
-use App\Http\Actions\Checker\UserChecker;
 use App\Http\Requests\ListChapterRequest;
 use App\Http\Resources\ChapterCollection;
 use App\Http\Resources\ExerciseCollection;
@@ -20,11 +19,10 @@ use App\Http\Actions\Question\ListQuestion;
 
 class ChapterController extends Controller
 {
-    public function __construct(UserChecker $userChecker)
+    public function __construct()
     {
         $this->middleware(['auth:api']);
         $this->middleware('role:teacher', ['only' => ['store', 'update', 'delete']]);
-        $this->userChecker = $userChecker;
     }
 
     public function index(ListChapterRequest $request, ListChapter $listChapter)
