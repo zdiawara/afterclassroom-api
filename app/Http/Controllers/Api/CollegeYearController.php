@@ -6,8 +6,10 @@ use App\CollegeYear;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\CollegeYearResource;
 
-class CollegeYearController extends Controller{
-    public function index(){
-        return CollegeYearResource::collection(CollegeYear::with(['etat'])->get());
+class CollegeYearController extends Controller
+{
+    public function index()
+    {
+        return CollegeYearResource::collection(CollegeYear::all());
     }
 }

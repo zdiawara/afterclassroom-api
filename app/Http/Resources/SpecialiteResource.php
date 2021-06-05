@@ -16,8 +16,7 @@ class SpecialiteResource extends JsonResource
     {
         return [
             'id' => (string) $this->id,
-            'name' => $this->name,
-            'code' => $this->code
+            'name' => $this->name
         ];
     }
 }

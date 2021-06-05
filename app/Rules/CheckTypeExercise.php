@@ -25,10 +25,10 @@ class CheckTypeExercise implements Rule
      * @param  mixed  $id
      * @return bool
      */
-    public function passes($attribute, $code)
+    public function passes($attribute, $id)
     {
-        $referentiel = Referentiel::where("code", $code)->where("type", TypeReferentiel::EXERCISE)->first();
-        return isset($referentiel);
+        $referentiel = Referentiel::find($id);
+        return isset($referentiel) && $referentiel->type == TypeReferentiel::EXERCISE;
     }
 
     /**

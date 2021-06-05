@@ -2,11 +2,12 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Classe;
+
 use App\Teacher;
-use App\MatiereTeacher;
+use App\TeacherMatiere;
 use App\Mail\UserIdentify;
 use App\Constants\CodeReferentiel;
+use Illuminate\Support\Facades\DB;
 use App\Http\Actions\User\UserField;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Mail;
@@ -14,27 +15,22 @@ use App\Http\Actions\User\ManageUser;
 use App\Http\Requests\TeacherRequest;
 use App\Http\Resources\TeacherResource;
 use App\Http\Actions\Checker\UserChecker;
-use Symfony\Component\HttpFoundation\Request;
-use App\Http\Actions\Referentiel\FindReferentiel;
-use App\Http\Actions\Teacher\CountTeacherEnseignement;
+use App\Http\Actions\User\ManageIdentify;
 use App\Http\Requests\ListTeacherRequest;
-use App\Http\Resources\UserResource;
-use App\User;
-use Illuminate\Support\Facades\DB;
+use Symfony\Component\HttpFoundation\Request;
+use App\Http\Actions\Teacher\CountTeacherEnseignement;
 
 
 class TeacherController extends Controller
 {
 
     private UserChecker $userChecker;
-    private FindReferentiel $findReferentiel;
 
-    public function __construct(UserChecker $userChecker, UserField $userField, FindReferentiel $findReferentiel)
+    public function __construct(UserChecker $userChecker, UserField $userField)
     {
         $this->middleware('auth:api', ['except' => ['store']]);
         $this->userChecker = $userChecker;
         $this->userField = $userField;
-        $this->findReferentiel = $findReferentiel;
     }
 
     /**
@@ -42,25 +38,23 @@ class TeacherController extends Controller
      */
     public function index(ListTeacherRequest $request)
     {
-        $teachers = Teacher::whereHas('matiereTeachers', function ($q) use ($request) {
-            $q->whereHas('matiere', function ($query) use ($request) {
-                $query->where('code', $request->get('matiere'));
-            })->whereHas('level', function ($query) use ($request) {
-                if ($request->has('level') && $request->get('level') === CodeReferentiel::LYCEE) {
-                    $query->where('code', CodeReferentiel::LYCEE);
-                }
-            })->whereHas('teacher', function ($query) use ($request) {
-                if ($request->has('search')) {
-                    $search = strtolower($request->get('search'));
-                    $query->whereHas('user', function ($q1)  use ($search) {
-                        $q1->where(DB::raw('lower(username)'), 'like', '%' . $search . '%')
-                            ->orWhere(DB::raw('lower(firstname)'), 'like', '%' . $search . '%')
-                            ->orWhere(DB::raw('lower(lastname)'), 'like', '%' . $search . '%');
-                    });
-                }
-            })->whereHas('etat', function ($query) {
-                $query->where('code', CodeReferentiel::VALIDATED);
-            });
+        $teachers = Teacher::whereHas('TeacherMatieres', function ($q) use ($request) {
+            $q->where('matiere_id', $request->get('matiere'))
+                ->where('etat_id', CodeReferentiel::VALIDATED)
+                ->where(function ($query) use ($request) {
+                    if ($request->has('level') && $request->get('level') === CodeReferentiel::LYCEE) {
+                        $query->where('level_id', CodeReferentiel::LYCEE);
+                    }
+                })->whereHas('teacher', function ($query) use ($request) {
+                    if ($request->has('search')) {
+                        $search = strtolower($request->get('search'));
+                        $query->whereHas('user', function ($q1)  use ($search) {
+                            $q1->where(DB::raw('lower(username)'), 'like', '%' . $search . '%')
+                                ->orWhere(DB::raw('lower(firstname)'), 'like', '%' . $search . '%')
+                                ->orWhere(DB::raw('lower(lastname)'), 'like', '%' . $search . '%');
+                        });
+                    }
+                });
         })->get();
 
         return TeacherResource::collection($teachers);
@@ -69,12 +63,16 @@ class TeacherController extends Controller
     /**
      * 
      */
-    public function store(TeacherRequest $request, ManageUser $manageUser, FindReferentiel $findReferentiel)
+    public function store(TeacherRequest $request, ManageIdentify $manageIdentify, ManageUser $manageUser)
     {
+
         DB::beginTransaction();
-        $teacher = new Teacher();
+        $username = $manageIdentify->buildIdentify();
+        $teacher = new Teacher(['id' => $username]);
         $teacher->save();
-        $teacher->user()->save($user = $manageUser->create($request));
+
+        $teacher->user()->save($user = $manageUser->create($request, $username));
+
         collect($request->get('matieres'))->each(function ($matiere) use ($teacher) {
             $this->createTeacherMatiere($matiere, $teacher->id);
         });
@@ -85,14 +83,14 @@ class TeacherController extends Controller
 
     private function createTeacherMatiere($matiere, $teacherId)
     {
-        return MatiereTeacher::firstOrCreate(
+        return TeacherMatiere::firstOrCreate(
             [
                 'teacher_id' => $teacherId,
                 'matiere_id' => $matiere['code'],
                 'level_id' => $matiere['level']
             ],
             [
-                'etat_id' => $this->findReferentiel->byCodeEtat(CodeReferentiel::VALIDATING)->id
+                'etat_id' => CodeReferentiel::VALIDATING
             ]
         );
     }

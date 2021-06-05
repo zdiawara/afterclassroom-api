@@ -9,5 +9,7 @@ class Country extends Model
     //
     protected $guarded = [];
 
-  
+    protected $keyType = 'string';
+
+    public $incrementing = false;
 }

@@ -14,11 +14,11 @@ class CreateClasseMatieresTable extends Migration
     public function up()
     {
         Schema::create('classe_matiere', function (Blueprint $table) {
-            $table->id();
-            $table->unsignedBigInteger('classe_id');
-            $table->unsignedBigInteger('matiere_id');
-            $table->unsignedBigInteger('country_id');
-            $table->unsignedBigInteger('teacher_id')->nullable();
+            $table->increments('id');
+            $table->string('classe_id');
+            $table->string('matiere_id');
+            $table->string('country_id');
+            $table->string('teacher_id')->nullable();
             $table->timestamps();
             $table->foreign('classe_id')->references('id')->on('classes');
             $table->foreign('matiere_id')->references('id')->on('matieres');

@@ -17,7 +17,6 @@ class MatiereResource extends JsonResource
         return [
             'id' => (string) $this->id,
             'name' => $this->name,
-            'code' => $this->code,
             'abreviation' => $this->abreviation,
             'position' => $this->position,
             'specialites' => SpecialiteResource::collection($this->whenLoaded('specialites')),

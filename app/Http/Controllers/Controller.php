@@ -106,9 +106,10 @@ class Controller extends BaseController
     {
         $fields = [];
         if ($request->has('matiere')) {
-            $matiere = $request->get('matiere');
-            $fields['matiere_id'] = isset($matiere['code']) ? $matiere['code'] : $matiere;
-            $fields['specialite_id'] = isset($matiere['specialite']) ? $matiere['specialite'] : null;
+            $fields['matiere_id'] =  $request->get('matiere');
+        }
+        if ($request->has('specialite')) {
+            $fields['specialite_id'] =  $request->get('specialite');
         }
         return $fields;
     }

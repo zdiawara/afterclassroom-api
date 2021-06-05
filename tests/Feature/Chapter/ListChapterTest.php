@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Chapter;
 
+use App\Classe;
 use App\Chapter;
 use Tests\TestCase;
 use Symfony\Component\HttpFoundation\Response;
@@ -20,16 +21,21 @@ class ListChapterTest extends TestCase
 
         $size = 5;
 
-        factory(Chapter::class, $size)->make()->each(function () use ($teacher) {
-            $this->createChapter($teacher);
+        $classeId = factory(Classe::class)->create()->id;
+        $matiereId =  $teacher->matieres->random()->id;
+
+        factory(Chapter::class, $size)->make()->each(function () use ($teacher, $classeId, $matiereId) {
+            $this->createChapter($teacher, $classeId, $matiereId);
         });
 
         $response = $this->actingAs($teacher->user)->get(route('chapters.index', [
-            'teacher' => $teacher->user->username,
-            'matiere' => 'test',
-            'classe' => 'test'
+            'teacher' => $teacher->id,
+            'matiere' => $matiereId,
+            'classe' => $classeId
         ]));
 
         $response->assertStatus(Response::HTTP_OK);
+
+        $this->assertTrue(sizeof($response->json()['data']) == $size);
     }
 }

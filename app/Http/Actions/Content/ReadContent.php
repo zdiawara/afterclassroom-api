@@ -3,6 +3,8 @@
 namespace App\Http\Actions\Content;
 
 use App\Chapter;
+use App\Constants\CodeReferentiel;
+use App\Controle;
 use App\Question;
 use Illuminate\Database\Eloquent\Model;
 
@@ -20,13 +22,23 @@ class ReadContent
         return $chapter;
     }
 
-    public function byExercise(Model $exercise, bool $canReadContent)
+    public function byExercise($exercise, bool $canReadContent)
     {
         if (!$canReadContent && !$exercise->is_public) {
-            $exercise->enonce     = $this->defaultContent;
             $exercise->correction = $this->defaultContent;
         }
         return $exercise;
+    }
+
+    public function byControle(Controle $controle, bool $canReadContent)
+    {
+        if ($controle->type_id === CodeReferentiel::EXAMEN) {
+            if (!$canReadContent && !$controle->is_public) {
+                $controle->correction = $this->defaultContent;
+            }
+            return $controle;
+        }
+        return $this->byExercise($controle, $canReadContent);
     }
 
     public function byQuestion(Question $question, bool $canReadQuestion)

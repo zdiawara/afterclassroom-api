@@ -6,12 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Referentiel extends Model
 {
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array
-     */
-    protected $fillable = [
-        'name', 'code', 'type', 'position'
-    ];
+    protected $fillable = ['name', 'type', 'position', 'id'];
+    protected $keyType = 'string';
+    public $incrementing = false;
 }

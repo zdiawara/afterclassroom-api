@@ -20,7 +20,7 @@ class Queries
     public function addMatiere(array $fields)
     {
         if (isset($fields['matiere'])) {
-            return $this->whereHas('matiere', $fields['matiere']);
+            $this->query = $this->query->where('matiere_id', $fields['matiere']);
         }
         return $this;
     }
@@ -28,7 +28,15 @@ class Queries
     public function addSpecialite(array $fields)
     {
         if (isset($fields['specialite'])) {
-            return $this->whereHas('specialite', $fields['specialite']);
+            $this->query = $this->query->where('specialite_id', $fields['specialite']);
+        }
+        return $this;
+    }
+
+    public function addTypeControle($type)
+    {
+        if (isset($type)) {
+            $this->query = $this->query->where('type_id', $type);
         }
         return $this;
     }
@@ -36,7 +44,7 @@ class Queries
     public function addClasse(array $fields)
     {
         if (isset($fields['classe'])) {
-            return $this->whereHas('classe', $fields['classe']);
+            $this->query = $this->query->where('classe_id', $fields['classe']);
         }
         return $this;
     }
@@ -44,14 +52,6 @@ class Queries
     public function orderByPosition()
     {
         $this->query = $this->query->orderBy('position', 'asc');
-        return $this;
-    }
-
-    private function whereHas($relation, $code)
-    {
-        $this->query = $this->query->whereHas($relation, function ($q) use ($code) {
-            $q->where('code', $code);
-        });
         return $this;
     }
 
@@ -65,55 +65,25 @@ class Queries
         return $this->query->get();
     }
 
-    // public function addActive($query, $canReadInactive)
-    // {
-    //     if (!$canReadInactive) {
-    //         return $query->where('is_active', 1);
-    //     }
-    //     return $query;
-    // }
+    public function addActive($canReadInactive)
+    {
+        if (!$canReadInactive) {
+            $this->query = $this->query->where('is_active', 1);
+        }
+        return $this;
+    }
 
-    // public function buildCommonQuery($query, $request)
-    // {
-    //     $page = $request->get('page', 1);
+    public function addEnonceActive(bool $canReadInactive)
+    {
+        if (!$canReadInactive) {
+            $this->query = $this->query->where('is_enonce_active', 1);
+        }
+        return $this;
+    }
 
-    //     $newQuery = $query;
-
-    //     if ($request->has('matiere')) {
-    //         $newQuery = $this->whereHas($query, 'matiere', $request->get('matiere'));
-    //     }
-    //     if ($request->has('specialite')) {
-    //         $newQuery = $this->whereHas($query, 'specialite', $request->get('specialite'));
-    //     }
-
-    //     return [
-    //         'query' => $newQuery,
-    //         'page' => $page
-    //     ];
-    // }
-
-    // public function buildQuery($query, $request)
-    // {
-    //     $result = $this->buildCommonQuery($query, $request);
-
-    //     if ($request->has('classe')) {
-    //         $result['query'] = $this->whereHas($result['query'], 'classe', $request->get('classe'));
-    //     }
-
-    //     return $result;
-    // }
-
-    // public function bookQuery($query, $request)
-    // {
-
-    //     $classe = $request->get('classe');
-
-    //     $result = $this->buildCommonQuery($query, $request);
-
-    //     if (isset($classe)) {
-    //         $result['query'] = $this->whereHas($result['query'], 'classes', $classe);
-    //     }
-
-    //     return $result;
-    // }
+    public function with(array $deps)
+    {
+        $this->query = $this->query->with($deps);
+        return $this;
+    }
 }

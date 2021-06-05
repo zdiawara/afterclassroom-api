@@ -43,6 +43,12 @@ class User  extends Authenticatable implements JWTSubject
         'email_verified_at' => 'datetime',
     ];
 
+    protected $primaryKey = 'username';
+
+    protected $keyType = 'string';
+
+    public $incrementing = false;
+
     public function gender()
     {
         return $this->belongsTo(Referentiel::class);

@@ -2,15 +2,24 @@
 
 namespace App;
 
-use App\Notion;
-use App\Solution;
 use App\Referentiel;
-use App\Constants\TypeReferentiel;
+use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Model;
 
 class Exercise extends Model
 {
     protected $guarded = [];
+
+    protected $keyType = 'string';
+
+    public $incrementing = false;
+
+    protected static function booted()
+    {
+        static::creating(function ($exercise) {
+            $exercise->id = (string) Str::uuid();
+        });
+    }
 
     //
     public function type()
@@ -22,12 +31,5 @@ class Exercise extends Model
     public function chapter()
     {
         return $this->belongsTo(Chapter::class);
-    }
-
-    public function setTypeIdAttribute($code)
-    {
-        if (!is_null($code)) {
-            $this->attributes['type_id'] = Referentiel::where("code", $code)->where("type", TypeReferentiel::EXERCISE)->firstOrFail()->id;
-        }
     }
 }

@@ -15,12 +15,12 @@ class CreateStudentTeachersTable extends Migration
     {
         Schema::create('student_teacher', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('student_id');
-            $table->unsignedBigInteger('teacher_id');
-            $table->unsignedBigInteger('classe_id');
-            $table->unsignedBigInteger('matiere_id');
-            $table->unsignedBigInteger('enseignement_id'); // enseignement | faq | exam_subject
-            $table->unsignedBigInteger('college_year_id');
+            $table->string('student_id');
+            $table->string('teacher_id');
+            $table->string('classe_id');
+            $table->string('matiere_id');
+            $table->string('enseignement_id'); // enseignement | faq | exam_subject
+            $table->year('college_year_id');
             $table->timestamps();
             $table->softDeletes();
             $table->foreign('enseignement_id')->references('id')->on('referentiels');

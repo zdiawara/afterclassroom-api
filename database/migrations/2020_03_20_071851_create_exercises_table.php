@@ -14,7 +14,7 @@ class CreateExercisesTable extends Migration
     public function up()
     {
         Schema::create('exercises', function (Blueprint $table) {
-            $table->id();
+            $table->uuid("id")->primary();
             $table->smallInteger('position')->default(1);
             $table->string('notions')->nullable();
             $table->string('prerequis')->nullable();
@@ -23,8 +23,8 @@ class CreateExercisesTable extends Migration
             $table->boolean('is_enonce_active')->default(false);;
             $table->longText('correction')->nullable();
             $table->boolean('is_correction_active')->default(false);;
-            $table->unsignedBigInteger('type_id');
-            $table->unsignedBigInteger('chapter_id');
+            $table->string('type_id');
+            $table->uuid('chapter_id');
             $table->timestamps();
 
             $table->foreign('chapter_id')->references('id')->on('chapters');

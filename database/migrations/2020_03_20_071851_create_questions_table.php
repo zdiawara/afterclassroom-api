@@ -14,12 +14,12 @@ class CreateQuestionsTable extends Migration
     public function up()
     {
         Schema::create('questions', function (Blueprint $table) {
-            $table->id();
+            $table->uuid("id")->primary();
             $table->string('title', 255);
             $table->longText('content')->nullable();
             $table->boolean('is_active')->default(false);
             $table->boolean('is_public')->default(true);
-            $table->unsignedBigInteger('chapter_id');
+            $table->uuid('chapter_id');
             $table->timestamps();
             $table->foreign('chapter_id')->references('id')->on('chapters');
         });

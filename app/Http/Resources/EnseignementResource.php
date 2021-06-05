@@ -26,7 +26,7 @@ class EnseignementResource extends JsonResource
     {
 
         return [
-            'id' => (string) $this->id,
+            'id' => $this->id,
             'matiere' => new MatiereResource($this->whenLoaded('matiere')),
             'specialite' => new SpecialiteResource($this->whenLoaded('specialite')),
             'classe' => new ClasseResource($this->whenLoaded('classe')),

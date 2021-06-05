@@ -2,10 +2,8 @@
 
 namespace App\Http\Requests;
 
-use App\Rules\CheckMatieres;
 use App\Http\Requests\UserRequest;
-use App\Http\Requests\CustumRequest;
-use Illuminate\Foundation\Http\FormRequest;
+use App\Rules\CheckMatiere;
 
 class TeacherRequest extends UserRequest
 {
@@ -19,11 +17,11 @@ class TeacherRequest extends UserRequest
     {
         $rules = [
             'matieres' => 'required',
-            'matieres.*.code' => 'required',
+            'matieres.*.code' => ['required', new CheckMatiere],
             'matieres.*.level' => 'required'
         ];
         if ($this->teacher) {
-            $this->userId = $this->teacher->user->userable_id;
+            $this->userId = $this->teacher->id;
         }
         return $this->makeRules(array_merge(parent::rules(), $rules));
     }

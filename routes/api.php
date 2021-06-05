@@ -40,13 +40,16 @@ Route::apiResource('teachers.matieres', "Api\TeacherMatiereController");
 
 // Student
 Route::apiResource('students', "Api\StudentController");
-Route::apiResource('students.teachers', "Api\StudentTeacherController");
+Route::apiResource('students.classes', "Api\StudentClasseController");
+
+// Subscription
+Route::apiResource('subscriptions', "Api\SubscriptionController");
 
 // Chapter
-Route::apiResource('chapters', "ChapterController");
-Route::group(['prefix' => 'chapters'], function ($router) {
-    Route::get('/{chapter}/exercises', 'ChapterController@showExercises')->name('chapters.showExercises');
-    Route::get('/{chapter}/questions', 'ChapterController@showQuestions')->name('chapters.showQuestions');
+Route::apiResource('chapters', "Api\ChapterController");
+Route::group(['prefix' => 'chapters'], function () {
+    Route::get('/{chapter}/exercises', 'Api\ChapterController@showExercises')->name('chapters.showExercises');
+    Route::get('/{chapter}/questions', 'Api\ChapterController@showQuestions')->name('chapters.showQuestions');
 });
 
 // Exercise
@@ -65,8 +68,11 @@ Route::group(['prefix' => 'college_years'], function ($router) {
 
 /////
 Route::apiResource('matieres', "Api\MatiereController");
-Route::apiResource('matieres.specialites', "Api\SpecialiteController");
+Route::apiResource('matieres.classes', "Api\ClasseMatiereController");
 Route::apiResource('classes', "Api\ClasseController");
+Route::group(['prefix' => 'classes'], function ($router) {
+    Route::get('/{classe}/matieres', 'Api\ClasseController@showMatieres')->name('classe.matieres');
+});
 
 Route::apiResource('files', "Api\FileController");
 

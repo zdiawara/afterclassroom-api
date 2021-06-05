@@ -88,19 +88,19 @@ class Generate
 
         $content = '';
         if ($faker->numberBetween(1, 5) % 2 == 0) {
-            $content = $content . '<p>' . $faker->paragraph(3, true) . "</p>";
+            $content = $content . '<p>' . $faker->paragraph(1, true) . "</p>";
         }
 
-        $nbQuestion = rand(3, 6);
+        $nbQuestion = rand(1, 3);
         $content =  $content . '<ol>';
-        for ($i = 1; $i < $nbQuestion; $i++) {
+        for ($i = 1; $i <= $nbQuestion; $i++) {
             $content = $content . '<li>' . $faker->paragraph(rand(1, 3), true) . "</li>";
-            $nbSubQuestion = rand(0, 2);
+            $nbSubQuestion = rand(1, 2);
             if ($nbSubQuestion > 0) {
                 $content = $content . '<ol type="a">';
             }
             for ($j = 0; $j < $nbSubQuestion; $j++) {
-                $content = $content . "<li>" . $faker->paragraph(rand(1, 3), true) . "</li>";
+                $content = $content . "<li>" . $faker->paragraph(rand(1, 2), true) . "</li>";
             }
             if ($nbSubQuestion > 0) {
                 $content = $content . '</ol>';

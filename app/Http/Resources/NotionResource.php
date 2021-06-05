@@ -16,7 +16,6 @@ class NotionResource extends EnseignementResource
             parent::toArray($request),
             [
                 'title' => $this->title,
-                'questionsCount' => $this->questions_count
             ]
         );
     }
