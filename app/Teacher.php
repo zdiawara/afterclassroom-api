@@ -17,6 +17,10 @@ class Teacher extends Model
 
     protected $guarded = [];
 
+    protected $keyType = 'string';
+
+    public $incrementing = false;
+
     // Relation avec User
     public function user()
     {
@@ -26,12 +30,12 @@ class Teacher extends Model
     //
     public function matieres()
     {
-        return $this->belongsToMany(Matiere::class);
+        return $this->belongsToMany(Matiere::class, 'teacher_matiere')->withTimestamps();;
     }
 
-    public function matiereTeachers()
+    public function TeacherMatieres()
     {
-        return $this->hasMany(MatiereTeacher::class);
+        return $this->hasMany(TeacherMatiere::class);
     }
 
     public function chapters()

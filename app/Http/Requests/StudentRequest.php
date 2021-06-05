@@ -4,10 +4,11 @@ namespace App\Http\Requests;
 
 use App\Http\Requests\UserRequest;
 use App\Http\Requests\CustumRequest;
+use App\Rules\CheckClasse;
 
 class StudentRequest extends UserRequest
 {
-    
+
     /**
      * Get the validation rules that apply to the request.
      *
@@ -16,10 +17,11 @@ class StudentRequest extends UserRequest
     public function rules()
     {
         $rules = [
-            "classe" => 'required'
+            "classe" => ['required', new CheckClasse]
         ];
-        if($this->student){
-            $this->userId = $this->student->user->userable->id;
+
+        if ($this->student) {
+            $this->userId = $this->student->id;
         }
         return $this->makeRules(array_merge(parent::rules(), $rules));
     }

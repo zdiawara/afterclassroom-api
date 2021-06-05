@@ -16,7 +16,7 @@ class ControleRequest extends CustumRequest
     public function rules()
     {
         $rules = [
-            'year' => 'required_if:subject,final_examen',
+            'year' => 'required',
             'type' => 'required',
             //'trimestre' => 'required_if:type,devoir',
             'enonce.active' => 'boolean',

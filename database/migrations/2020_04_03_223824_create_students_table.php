@@ -14,11 +14,8 @@ class CreateStudentsTable extends Migration
     public function up()
     {
         Schema::create('students', function (Blueprint $table) {
-            $table->id();
-            $table->unsignedBigInteger('classe_id');
+            $table->string("id")->primary();
             $table->timestamps();
-
-            $table->foreign('classe_id')->references('id')->on('classes');
         });
     }
 

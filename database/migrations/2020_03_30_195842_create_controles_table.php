@@ -14,28 +14,26 @@ class CreateControlesTable extends Migration
     public function up()
     {
         Schema::create('controles', function (Blueprint $table) {
-            $table->id();
+            $table->uuid("id")->primary();
             $table->smallInteger('position')->default(1);
-            $table->year('year')->nullable();
+            $table->year('year');
             $table->boolean('is_public')->default(true);
             $table->longText('enonce')->nullable();
             $table->boolean('is_enonce_active')->default(false);;
             $table->longText('correction')->nullable();
             $table->boolean('is_correction_active')->default(false);;
 
-            $table->unsignedBigInteger('teacher_id');
-            $table->unsignedBigInteger('classe_id');
-            $table->unsignedBigInteger('matiere_id');
-            $table->unsignedBigInteger('specialite_id')->nullable();
+            $table->string('teacher_id');
+            $table->string('classe_id');
+            $table->string('matiere_id');
+            $table->string('specialite_id')->nullable();
 
-            $table->unsignedBigInteger('type_id');
-            $table->unsignedBigInteger('trimestre_id')->nullable();;
-            //$table->unsignedBigInteger('subject_id')->nullable();;
+            $table->string('type_id');
+            $table->string('trimestre_id')->nullable();
 
 
             $table->timestamps();
 
-            //$table->foreign('subject_id')->references('id')->on('referentiels');
             $table->foreign('type_id')->references('id')->on('referentiels');
             $table->foreign('trimestre_id')->references('id')->on('referentiels');
             $table->foreign('teacher_id')->references('id')->on('teachers');

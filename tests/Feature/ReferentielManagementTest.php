@@ -2,7 +2,6 @@
 
 namespace Tests\Feature;
 
-use App\User;
 use Tests\TestCase;
 use App\Referentiel;
 use App\Http\Resources\ReferentielResource;
@@ -15,17 +14,18 @@ class ReferentielManagementTest extends TestCase
 
 
     /** @test **/
+    /** @ignore **/
     public function a_referentiel_can_be_create()
     {
 
         $referentiel = factory(Referentiel::class)->make();
 
         $user = $this->createAdmin()->user;
-        
-        $response = $this->actingAs($user)
-            ->post(route('referentiels.store'),$referentiel->toArray());
 
-        $referentiel->id=1;
+        $response = $this->actingAs($user)
+            ->post(route('referentiels.store'), $referentiel->toArray());
+
+        $referentiel->id = 1;
         $response
             ->assertStatus(Response::HTTP_CREATED)
             ->assertJsonFragment($this->decodeResource(new ReferentielResource($referentiel)));
@@ -33,6 +33,7 @@ class ReferentielManagementTest extends TestCase
 
 
     /** @test **/
+    /** @ignore **/
     public function a_referentiel_can_be_update()
     {
         $user = $this->createAdmin()->user;
@@ -41,11 +42,11 @@ class ReferentielManagementTest extends TestCase
 
         $referentiel = Referentiel::first();
         $referentiel->name = "New name";
-        $referentiel->code = "new code";
+        $referentiel->id = "test";
         $referentiel->type = "new type";
-        
+
         $response = $this->actingAs($user)->put(
-            route('referentiels.update',[ "referentiel"=> $referentiel->id]),
+            route('referentiels.update', ["referentiel" => $referentiel->id]),
             $referentiel->toArray()
         );
 
@@ -53,6 +54,4 @@ class ReferentielManagementTest extends TestCase
             ->assertStatus(Response::HTTP_CREATED)
             ->assertJson($this->decodeResource(new ReferentielResource($referentiel)));
     }
-
-
 }

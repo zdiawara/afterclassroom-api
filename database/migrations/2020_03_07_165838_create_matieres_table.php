@@ -15,13 +15,11 @@ class CreateMatieresTable extends Migration
     {
         Schema::create('matieres', function (Blueprint $table) {
 
-            $table->id();
-            $table->string('name',50);
-            $table->string('abreviation',20);
+            $table->string("id")->primary();
+            $table->string('name', 50);
+            $table->string('abreviation', 20);
             $table->smallInteger('position');
-            $table->string('code',20)->unique();
             $table->timestamps();
-            
         });
     }
 

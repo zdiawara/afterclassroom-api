@@ -6,6 +6,7 @@ use Tests\TestCase;
 use App\Referentiel;
 use App\Constants\CodeReferentiel;
 use App\Constants\TypeReferentiel;
+use App\Exercise;
 use App\Http\Resources\ExerciseResource;
 use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -33,21 +34,14 @@ class ManageExerciseTest extends TestCase
         $result = $this->createExercise();
 
         $exercise = $result['exercise'];
-
-        $type = Referentiel::firstOrCreate(
-            ['code' => CodeReferentiel::SYNTHESE, 'type' => TypeReferentiel::EXERCISE],
-            ['name' => 'Test', 'position' => 0]
-        );
-
         $exercise->enonce = "Test enonce";
         $exercise->is_enonce_active = 0;
         $exercise->correction = "Test correction";
-        $exercise->type_id = $type->code;
 
         $response = $this->actingAs($exercise->chapter->teacher->user)->put(
             route('exercises.update', ["exercise" => $exercise->id]),
             [
-                "type" => $type->code,
+
                 "enonce" => [
                     'data' =>  $exercise->enonce,
                     'active' =>  $exercise->is_enonce_active
@@ -80,8 +74,9 @@ class ManageExerciseTest extends TestCase
                 ]
             );
 
+
         $response
-            ->assertStatus(Response::HTTP_CREATED)
-            ->assertJson($this->decodeResource(new ExerciseResource($result['exercise'])));
+            ->assertStatus(Response::HTTP_CREATED);
+        $this->assertEquals(Exercise::find($result['exercise']->id)->is_active, 0);
     }
 }

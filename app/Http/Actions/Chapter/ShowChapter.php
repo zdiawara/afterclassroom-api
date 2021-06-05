@@ -27,12 +27,12 @@ class ShowChapter
 
     public function execute(Chapter $chapter)
     {
-        $teacher = $chapter->teacher->user->username;
-        $this->enseignementChecker->checkCanReadInactive($chapter->is_active, $chapter->teacher->user->username);
+        $teacher = $chapter->teacher_id;
+        $this->enseignementChecker->checkCanReadInactive($chapter->is_active, $chapter->teacher_id);
 
         $params = [
-            "matiere" => $chapter->matiere->code,
-            "classe" => $chapter->classe->code,
+            "matiere" => $chapter->matiere_id,
+            "classe" => $chapter->classe_id,
         ];
         $canReadContent = $this->dataAccess->canReadContent($teacher, $params);
         return $this->readContent->byChapter($chapter, $canReadContent);

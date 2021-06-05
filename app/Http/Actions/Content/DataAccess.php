@@ -4,20 +4,21 @@ namespace App\Http\Actions\Content;
 
 use App\Constants\CodeReferentiel;
 use App\Http\Actions\Student\FindStudentTeacher;
+use App\Http\Actions\Subscription\HasSubscription;
 
 class DataAccess
 {
 
-    private FindStudentTeacher $findStudentTeacher;
+    private HasSubscription $hasSubscription;
 
-    public function __construct(FindStudentTeacher $findStudentTeacher)
+    public function __construct(HasSubscription $hasSubscription)
     {
-        $this->findStudentTeacher = $findStudentTeacher;
+        $this->hasSubscription = $hasSubscription;
     }
 
-    public function canReadContent(string $teacher, array $params = [])
+    public function canReadContent(string $teacherId, array $paramsIds = [])
     {
-        return $this->canRead(CodeReferentiel::BASIC, $teacher, $params);
+        return $this->canRead(CodeReferentiel::BASIC, $teacherId, $paramsIds);
     }
 
     public function canReadQuestion(string $teacher, array $params = [])
@@ -30,18 +31,20 @@ class DataAccess
         return $this->canRead(CodeReferentiel::EXAM_SUBJECT, $teacher, $params);
     }
 
-    private function canRead(string $enseignement, string $teacher, array $params = [])
+    private function canRead(string $enseignement, string $teacherId, array $paramsIds = [])
     {
         $user = auth()->userOrFail();
-        if ($user->isTeacher() && $user->isOwner($teacher)) {
+        if ($user->isTeacher() && $user->isOwner($teacherId)) {
             return true;
         }
         $_params = array_merge(
-            $params,
-            ["teacher" => $teacher, 'enseignement' => $enseignement]
+            $paramsIds,
+            ["teacher" => $teacherId, 'enseignement' => $enseignement,]
         );
-        if ($user->isStudent() && $this->findStudentTeacher->byCode($user, $_params) != null) {
-            return true;
+        if ($user->isStudent()) {
+            return $this->hasSubscription->execute(
+                array_merge($_params, ['student' => $user->username])
+            );
         }
         return false;
     }

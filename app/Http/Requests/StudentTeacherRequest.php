@@ -3,6 +3,9 @@
 namespace App\Http\Requests;
 
 use App\Http\Requests\CustumRequest;
+use App\Rules\CheckClasse;
+use App\Rules\CheckEnseignement;
+use App\Rules\CheckMatiere;
 
 class StudentTeacherRequest extends CustumRequest
 {
@@ -16,10 +19,10 @@ class StudentTeacherRequest extends CustumRequest
     public function rules()
     {
         $rules = [
-            'matiere' => 'required',
+            'matiere' => ['required', new CheckMatiere],
             'teacher' => 'string',
-            'classe' => 'required',
-            'enseignement' => 'required',
+            'classe' => ['required', new CheckClasse],
+            'enseignement' => ['required', new CheckEnseignement],
         ];
         return $this->makeRules($rules);
     }

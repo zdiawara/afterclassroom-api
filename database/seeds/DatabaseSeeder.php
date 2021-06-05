@@ -5,7 +5,6 @@ use App\Classe;
 use App\Matiere;
 use App\Student;
 use App\Teacher;
-use App\Category;
 use App\Chapter;
 use App\Controle;
 use App\Exercise;
@@ -21,8 +20,9 @@ use App\Constants\CodeReferentiel;
 use App\Constants\TypeReferentiel;
 use App\Http\Actions\Content\DocumentPlan;
 use App\Http\Actions\User\ManageIdentify;
-use App\MatiereTeacher;
+use App\TeacherMatiere;
 use App\Question;
+use App\Subscription;
 
 class DatabaseSeeder extends Seeder
 {
@@ -33,32 +33,15 @@ class DatabaseSeeder extends Seeder
      */
     public function run()
     {
-        Identify::create([
-            'tranche' => 10,
-            "current" => 0
-        ]);
+        Identify::create(['tranche' => 10, "current" => 0]);
+        Country::create(['id' => "bf", 'name' => "Burkina Faso", 'abreviation' => 'BF']);
 
         $this->createReferentiels();
-
-        Country::create([
-            'name' => "Burkina Faso",
-            'code' => "bf"
-        ]);
-
-        $classes = $this->generateClasses();
-
-        /*$this->createSubject("Sujet type Bepc",CodeReferentiel::SUJET_TYPE_BEPC,'troisieme');
-        $this->createSubject("Bepc",CodeReferentiel::BEPC,'troisieme');
-        $this->createSubject("Sujet type Bac",CodeReferentiel::SUJET_TYPE_BAC,"terminale");
-        $this->createSubject("Bac",CodeReferentiel::BAC,'terminale');*/
-
+        $this->generateClasses();
         $this->generateMatieres();
 
-        $lycee = Referentiel::where('type', TypeReferentiel::LEVEL)
-            ->where('code', CodeReferentiel::LYCEE)->first();
-
-        $college = Referentiel::where('type', TypeReferentiel::LEVEL)
-            ->where('code', CodeReferentiel::COLLEGE)->first();
+        $lycee = Referentiel::find(CodeReferentiel::LYCEE);
+        $college = Referentiel::find(CodeReferentiel::COLLEGE);
 
         // Creation d'un teacher
         $t1 = $this->createTeacher('Yao', 'Lovie', 'lovie.yao@test.com', ['maths'], $lycee);
@@ -81,14 +64,14 @@ class DatabaseSeeder extends Seeder
         $this->createStudent('Alassane', 'Traoré', 'traore.alassane@test.com', 'troisieme');
         $this->createStudent('Jean', 'Somé', 'some.jean@test.com', 'sixieme');
 
-        $this->createStudentTeacher($s1, $t1, 'maths', 'terminale_d');
-        $this->createStudentTeacher($s1, $t4, 'pc', 'terminale_d');
+        $this->createSubscription($s1, $t1, 'maths', 'terminale_d');
+        $this->createSubscription($s1, $t4, 'pc', 'terminale_d');
 
         $this->generateClasseMatieres();
 
         $this->createChapters();
         $this->createQuestions();
-        // $this->createControles();
+        $this->createExamens();
     }
 
     private function generateClasseMatieres()
@@ -122,17 +105,14 @@ class DatabaseSeeder extends Seeder
         collect($data)->each(function ($item, $country) {
             collect($item)->each(function ($matieres, $classe) use ($country) {
                 collect($matieres)->each(function ($matiere) use ($classe, $country) {
-                    $_classe = Classe::where('code', $classe)->first();
+                    $_classe = Classe::find($classe);
                     $teacherId = null;
                     if ($_classe->has_faq == 1 || $_classe->is_exam_class == 1) {
-                        $teacherId = MatiereTeacher::whereHas('level', function ($query) use ($_classe) {
-                            if ($_classe->level->code == CodeReferentiel::LYCEE) {
-                                $query->where('level_id', $_classe->level_id);
-                            }
-                        })
-                            ->whereHas('matiere', function ($query) use ($matiere) {
-                                $query->where('code', $matiere);
-                            })->get()->random()->teacher_id;
+                        $query = TeacherMatiere::where('matiere_id', $matiere);
+                        if ($_classe->level->id == CodeReferentiel::LYCEE) {
+                            $query = $query->where('level_id', $_classe->level_id);
+                        }
+                        $teacherId = $query->get()->random()->teacher_id;
                     }
                     $classeMatiere = new ClasseMatiere([
                         'classe_id' => $classe,
@@ -149,27 +129,47 @@ class DatabaseSeeder extends Seeder
     private function createChapters()
     {
 
-        MatiereTeacher::all()->each(function ($matiereTeacher) {
-
-            Classe::all()->each(function ($classe) use ($matiereTeacher) {
-                factory('App\Chapter', rand(4, 7))->make()->each(function ($chapter) use ($matiereTeacher, $classe) {
-                    $chapter->teacher_id = $matiereTeacher->teacher->user->username;
-                    $chapter->matiere_id = $matiereTeacher->matiere->code;
-                    $chapter->classe_id = $classe->code;
+        TeacherMatiere::all()->each(function ($teacherMatiere) {
+            Classe::all()->each(function ($classe) use ($teacherMatiere) {
+                factory(Chapter::class, rand(2, 5))->make()->each(function ($chapter) use ($teacherMatiere, $classe) {
+                    $chapter->teacher_id = $teacherMatiere->teacher_id;
+                    $chapter->matiere_id = $teacherMatiere->matiere_id;
+                    $chapter->classe_id = $classe->id;
                     $chapter->specialite_id = $this->getSpecialite($chapter->matiere_id);
                     $chapter->toc = (new DocumentPlan())->execute($chapter->content);
                     $chapter->save();
 
-                    factory(Exercise::class, rand(5, 10))->make()->each(function ($exercise) use ($chapter) {
-                        $exercise->chapter_id = $chapter->id;
-                        $exercise->is_enonce_active = $exercise['enonce']['active'];
-                        $exercise->enonce = $exercise['enonce']['data'];
-                        $exercise->is_correction_active = $exercise['correction']['active'];
-                        $exercise->correction = $exercise['correction']['data'];
-                        $exercise->type_id = Referentiel::where('type', TypeReferentiel::EXERCISE)->get()->random()->code;
+                    factory(Exercise::class, rand(0, 5))->make()->each(function ($exercise) use ($chapter) {
+                        $newExercise = new Exercise();
+                        $newExercise->chapter_id = $chapter->id;
+                        $newExercise->is_enonce_active = $exercise['enonce']['active'];
+                        $newExercise->enonce = $exercise['enonce']['data'];
+                        $newExercise->is_correction_active = $exercise['correction']['active'];
+                        $newExercise->correction = $exercise['correction']['data'];
+                        $newExercise->type_id = Referentiel::where('type', TypeReferentiel::EXERCISE)
+                            ->get()
+                            ->random()
+                            ->id;
 
-                        $exercise->save();
+                        $newExercise->save();
                     });
+                });
+
+
+                factory(Controle::class, rand(1, 5))->make()->each(function ($controle)  use ($teacherMatiere, $classe) {
+                    $newControle = $this->buildControle($controle, $teacherMatiere->teacher, $teacherMatiere->matiere, $classe);
+
+                    $newControle->type_id = Referentiel::WhereIn('id', [CodeReferentiel::DEVOIR, CodeReferentiel::COMPOSITION])
+                        ->get()
+                        ->random()
+                        ->id;
+
+                    $newControle->trimestre_id = Referentiel::where('type', TypeReferentiel::TRIMESTRE)
+                        ->get()
+                        ->random()
+                        ->id;
+
+                    $newControle->save();
                 });
             });
         });
@@ -184,7 +184,7 @@ class DatabaseSeeder extends Seeder
                     ->where('matiere_id', $classeMatiere->matiere_id)
                     ->where('classe_id', $classeMatiere->classe_id)->get()
                     ->each(function ($chapter) {
-                        factory(Question::class, rand(5, 15))
+                        factory(Question::class, rand(1, 5))
                             ->make()
                             ->each(function ($question) use ($chapter) {
                                 $question->chapter_id = $chapter->id;
@@ -194,58 +194,60 @@ class DatabaseSeeder extends Seeder
             });
     }
 
-    private function createControles()
+    private function createExamens()
     {
-        Teacher::all()->each(function ($teacher) {
-            factory('App\Controle', rand(50, 60))->make()->each(function ($controle) use ($teacher) {
-                $newControle = new Controle();
-                $newControle->teacher_id = $teacher->user->username;
-                $newControle->classe_id = Classe::where('level_id', $teacher->level->id)->get()->random()->code;
-                $newControle->matiere_id = $teacher->matieres->random()->code;
-                //$newControle->specialite_id = $this->getSpecialite($newControle->matiere_id);
-                $newControle->year = $controle->year;
-                $newControle->active_enonce = $controle['enonce']['active'];
-                $newControle->enonce = $controle['enonce']['data'];
-                $newControle->active_correction = $controle['correction']['active'];
-                $newControle->correction = $controle['correction']['data'];
-
-                $typeControle = Referentiel::where('type', TypeReferentiel::CONTROLE)->get()->random()->code;
-
-                $newControle->type_id = $typeControle;
-
-                if ($typeControle !== CodeReferentiel::EXAMEN) {
-                    $newControle->trimestre_id = Referentiel::where('type', TypeReferentiel::TRIMESTRE)->get()->random()->code;
-                } else {
-                    $newControle->subject_id = Referentiel::where('type', TypeReferentiel::EXAMEN)->get()->random()->code;
-                }
-
-                $newControle->save();
+        ClasseMatiere::whereNotNull('teacher_id')
+            ->whereHas('classe', function ($query) {
+                $query->where('is_exam_class', 1);
+            })
+            ->get()
+            ->each(function ($classeMatiere) {
+                factory(Controle::class, rand(5, 6))
+                    ->make()
+                    ->each(function ($controle)  use ($classeMatiere) {
+                        $newControle = $this->buildControle($controle, $classeMatiere->teacher, $classeMatiere->matiere, $classeMatiere->classe);
+                        $newControle->type_id = Referentiel::find(CodeReferentiel::EXAMEN)->id;
+                        $newControle->save();
+                    });
             });
-        });
+    }
+
+
+    private function buildControle(Controle $controle, Teacher $teacher, Matiere $matiere, Classe $classe)
+    {
+        $newControle = new Controle();
+        $newControle->teacher_id = $teacher->id;
+        $newControle->classe_id = $classe->id;
+        $newControle->matiere_id = $matiere->id;
+        $newControle->year = $controle->year;
+        $newControle->is_public = $controle->is_public;
+        $newControle->is_enonce_active = 1; // $controle['enonce']['active'];
+        $newControle->enonce = $controle['enonce']['data'];
+        $newControle->is_correction_active = 1; // $controle['correction']['active'];
+        $newControle->correction = $controle['correction']['data'];
+
+        return $newControle;
     }
 
     private function getSpecialite($matiere)
     {
         $specialites = Specialite::where('matiere_id', $matiere)->get();
         if ($specialites->count() != 0) {
-            return $specialites->random()->code;
+            return $specialites->random()->id;
         }
         return null;
     }
 
-    private function createStudentTeacher($student, $teacher, $matiere, $classe)
+    private function createSubscription($student, $teacher, $matiere, $classe)
     {
-        $st = new StudentTeacher();
-        $st->matiere_id = Matiere::where('code', $matiere)->first()->id;
-        $st->classe_id = Classe::where('code', $classe)->first()->id;
-        $st->student_id = $student->userable->id;
-        $st->teacher_id = $teacher->id;
-        $st->enseignement_id = Referentiel::where('type', TypeReferentiel::ENSEIGNEMENT)
-            ->where('code', CodeReferentiel::BASIC)
-            ->firstOrFail()
-            ->id;
-        $st->college_year_id = CollegeYear::first()->id;
-        $st->save();
+        $subcription = new Subscription();
+        $subcription->matiere_id = $matiere;
+        $subcription->classe_id = $classe;
+        $subcription->student_id = $student->id;
+        $subcription->teacher_id = $teacher->id;
+        $subcription->enseignement_id = CodeReferentiel::BASIC;
+        $subcription->college_year_id = CollegeYear::first()->id;
+        $subcription->save();
     }
 
     private function createReferentiels()
@@ -255,13 +257,8 @@ class DatabaseSeeder extends Seeder
         $this->createReferentiel('Femme', 'femme', 'gender', 2);
 
         ///// Niveau d'enseignement /////
-        $secondaire =  $this->createReferentiel('Collège', CodeReferentiel::COLLEGE, TypeReferentiel::LEVEL, 1);
-        $secondaire =  $this->createReferentiel('Collège et Lycée', CodeReferentiel::LYCEE, TypeReferentiel::LEVEL, 2);
-
-        ////// categories de livres
-        $this->createCategory('Annale', 'annale');
-        $this->createCategory('Roman', 'roman');
-        $this->createCategory('Livre', 'livre');
+        $secondaire =  $this->createReferentiel('1e Cycle', CodeReferentiel::COLLEGE, TypeReferentiel::LEVEL, 1);
+        $secondaire =  $this->createReferentiel('1e et 2e Cycle', CodeReferentiel::LYCEE, TypeReferentiel::LEVEL, 2);
 
         ///// Ajout referentiel controle
         $this->createReferentiel('Devoir', CodeReferentiel::DEVOIR, TypeReferentiel::CONTROLE, 1);
@@ -275,8 +272,8 @@ class DatabaseSeeder extends Seeder
         $this->createReferentiel('Sujet type examen', CodeReferentiel::TYPE_EXAMEN, TypeReferentiel::EXAMEN, 1);
         $this->createReferentiel("Sujet d'examen", CodeReferentiel::FINAL_EXAMEN, TypeReferentiel::EXAMEN, 2);
 
-        $this->createReferentiel("Application", CodeReferentiel::APPLICATION, TypeReferentiel::EXERCISE, 1);
-        $this->createReferentiel('Synthèse', CodeReferentiel::SYNTHESE, TypeReferentiel::EXERCISE, 2);
+        $this->createReferentiel("Exercice d'application", CodeReferentiel::APPLICATION, TypeReferentiel::EXERCISE, 1);
+        $this->createReferentiel('Exercice de synthèse', CodeReferentiel::SYNTHESE, TypeReferentiel::EXERCISE, 2);
 
         // Etat Justificatif
         $this->createReferentiel('En validation', CodeReferentiel::VALIDATING, TypeReferentiel::ETAT, 1);
@@ -288,37 +285,32 @@ class DatabaseSeeder extends Seeder
         $this->createReferentiel('FAQ', CodeReferentiel::FAQ, TypeReferentiel::ENSEIGNEMENT, 2);
         $this->createReferentiel('Sujet d\'examen', CodeReferentiel::EXAM_SUBJECT, TypeReferentiel::ENSEIGNEMENT, 3);
 
-
-        $ref = $this->createReferentiel('En cours', CodeReferentiel::IN_PROGRESS, TypeReferentiel::ETAT_COLLEGE_YEAR, 1);
         $year = date('Y', strtotime(now()));
+
+        $started = new DateTime($year - 1 . '-08-01');
         CollegeYear::create([
             'name' => ($year - 1) . '-' . $year,
-            'year' => $year,
-            'etat_id' => $ref->id
+            'id' => $year,
+            'started_at' => date('Y-m-d H:m:s', $started->getTimestamp()),
+            'finished_at' => date('Y-m-d H:m:s', $started->add(new DateInterval('P1Y'))->getTimestamp())
         ]);
-        $this->createReferentiel('Terminé', CodeReferentiel::FINISHED, TypeReferentiel::ETAT_COLLEGE_YEAR, 2);
     }
 
     private function createReferentiel($name, $code, $type, $position)
     {
-        return Referentiel::create(['name' => $name, 'code' => $code, 'type' => $type, 'position' => $position]);
-    }
-
-    private function createCategory($name, $code)
-    {
-        return Category::create(['name' => $name, 'code' => $code]);
+        return Referentiel::create(['name' => $name, 'id' => $code, 'type' => $type, 'position' => $position]);
     }
 
     private function generateClasses()
     {
 
-        $college = Referentiel::where('code', 'college')->where('type', 'level')->first();
+        $college = Referentiel::find(CodeReferentiel::COLLEGE);
         Classe::create($this->generateClasse('Sixième', '6°', 'sixieme', 1, $college));
         Classe::create($this->generateClasse('Cinquième', '5°', 'cinquieme', 2, $college));
         Classe::create($this->generateClasse('Quatrième', '4°', 'quatrieme', 3, $college));
         Classe::create($this->generateClasse('Troisième', '3°', 'troisieme', 4, $college));
 
-        $lycee = Referentiel::where('code', 'lycee')->where('type', 'level')->first();
+        $lycee = Referentiel::find(CodeReferentiel::LYCEE);
 
         Classe::create($this->generateClasse('Seconde A', '2nde A', 'seconde_a', 5, $lycee));
         Classe::create($this->generateClasse('Seconde C', '2nde C', 'seconde_c', 5, $lycee));
@@ -331,7 +323,7 @@ class DatabaseSeeder extends Seeder
         Classe::create($this->generateClasse('Terminale C', 'Tle C', 'terminale_c', 7, $lycee));
         Classe::create($this->generateClasse('Terminale D', 'Tle D', 'terminale_d', 7, $lycee));
 
-        Classe::whereIn('code', ["troisieme", 'terminale_a', 'terminale_c', 'terminale_d'])
+        Classe::whereIn('id', ["troisieme", 'terminale_a', 'terminale_c', 'terminale_d'])
             ->update([
                 'has_faq' =>  true,
                 'is_exam_class' => true
@@ -344,7 +336,7 @@ class DatabaseSeeder extends Seeder
         return [
             'name' => $name,
             'abreviation' => $abreviation,
-            'code' => $code,
+            'id' => $code,
             'position' => $niveau,
             'level_id' => $level->id
         ];
@@ -382,7 +374,7 @@ class DatabaseSeeder extends Seeder
     {
         $specialite = new Specialite();
         $specialite->name = $name;
-        $specialite->code = $code;
+        $specialite->id = $code;
         $specialite->matiere_id = $matiere->id;
         $specialite->save();
     }
@@ -391,7 +383,7 @@ class DatabaseSeeder extends Seeder
     {
         return Matiere::create([
             'name' => $name,
-            'code' => $code,
+            'id' => $code,
             'abreviation' => $abreviation,
             'position' => $position
         ]);
@@ -399,28 +391,31 @@ class DatabaseSeeder extends Seeder
 
     private function createTeacher($firstname, $lastname, $email, $matieres, $level)
     {
-        $teacher = new Teacher();
-        //$teacher->level_id = $level->id;
+        $username = (new ManageIdentify)->buildIdentify();
+        $teacher = new Teacher([
+            'id' => $username
+        ]);
         $teacher->save();
         $user = new User([
             'firstname' => $firstname,
             'lastname' => $lastname,
-            'username' => (new ManageIdentify)->buildIdentify(),
+            'username' => $username,
             'email' => $email,
             'email_verified_at' => now(),
             'password' => bcrypt('secret'),
             'avatar' => 'avatar.png',
-            'gender_id' => Referentiel::where("code", CodeReferentiel::HOMME)->where("type", TypeReferentiel::GENDER)->first()->id
+            'gender_id' => Referentiel::find(CodeReferentiel::HOMME)->id
         ]);
+
         $teacher->user()->save($user);
 
-        $refEtat = Referentiel::where("code", CodeReferentiel::VALIDATED)->where("type", TypeReferentiel::ETAT)->first();
-        collect($matieres)->each(function ($code) use ($teacher, $refEtat, $level) {
-            $matiere = Matiere::where('code', $code)->first();
+        $validated = Referentiel::find(CodeReferentiel::VALIDATED);
+
+        collect($matieres)->each(function ($code) use ($teacher, $validated, $level) {
+            $matiere = Matiere::find($code);
             $teacher->matieres()->attach($matiere->id, [
-                'etat_id' => $refEtat->id,
+                'etat_id' => $validated->id,
                 'level_id' => $level->id
-                //'justificatif' => 'test.pdf'
             ]);
         });
 
@@ -429,22 +424,32 @@ class DatabaseSeeder extends Seeder
 
     private function createStudent($firstname, $lastname, $email, $classe)
     {
-        $student = new Student();
-        $student->classe_id = $classe;
+        $username = (new ManageIdentify)->buildIdentify();
+
+        $student = new Student(["id" => $username]);
+
+        //$student->classe_id = $classe;
+
         $student->save();
 
         $user = new User([
             'firstname' => $firstname,
             'lastname' => $lastname,
-            'username' => (new ManageIdentify)->buildIdentify(),
+            'username' => $username,
             'email' => $email,
             'email_verified_at' => now(),
             'password' => bcrypt('secret'),
             'avatar' => 'avatar.png',
-            'gender_id' => Referentiel::where("code", CodeReferentiel::HOMME)->where("type", TypeReferentiel::GENDER)->first()->id
+            'gender_id' => Referentiel::find(CodeReferentiel::HOMME)->id
         ]);
 
         $student->user()->save($user);
-        return $user;
+        $student->classes()->attach($classe, [
+            'college_year_id' => CollegeYear::whereDate('started_at', '<=', date("Y-m-d"))
+                ->whereDate('finished_at', '>=', date("Y-m-d"))
+                ->firstOrFail()->id,
+            'changed' => 1
+        ]);
+        return $student;
     }
 }

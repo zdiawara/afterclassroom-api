@@ -2,12 +2,8 @@
 
 namespace Tests\Feature\Controle;
 
-use App\Matiere;
-use App\Teacher;
 use App\Controle;
 use Tests\TestCase;
-use App\Referentiel;
-use App\Http\Resources\ControleResource;
 use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
@@ -20,7 +16,7 @@ class ManageControleTest extends TestCase
     public function a_teacher_can_create_controle()
     {
         $this->withoutExceptionHandling();
-        
+
         $result = $this->createControle();
 
         $result['response']
@@ -36,13 +32,13 @@ class ManageControleTest extends TestCase
         $result = $this->createControle();
 
         $controle = Controle::first();
-       
+
         $response = $this->actingAs($result['teacher']->user)->put(
-            route('controles.update',["controle"=>$controle->id]),
+            route('controles.update', ["controle" => $controle->id]),
             [
                 'enonce' => [
-                    'data' =>'test',
-                    'active'=>1
+                    'data' => 'test',
+                    'active' => 1
                 ],
                 'year' => 2019
             ]
@@ -50,12 +46,14 @@ class ManageControleTest extends TestCase
 
         $response->assertStatus(Response::HTTP_CREATED);
 
-        $this->assertTrue(Controle::first()->enonce=='test');
+        $this->assertTrue(Controle::first()->enonce == 'test');
     }
 
     /** @test **/
     public function a_teacher_can_update_only_her_controle()
     {
+
+        //$this->withoutExceptionHandling();
 
         $result = $this->createControle();
 
@@ -65,12 +63,11 @@ class ManageControleTest extends TestCase
         $teacher = $this->createTeacher()['teacher'];
 
         $response = $this->actingAs($teacher->user)->put(
-            route('controles.update',["controle"=>$controle->id]),
-            ['year'=>2019]
+            route('controles.update', ["controle" => $controle->id]),
+            ['year' => 2019]
         );
-        
-        $response->assertStatus(Response::HTTP_UNAUTHORIZED);
 
+        $response->assertStatus(Response::HTTP_UNAUTHORIZED);
     }
 
 
@@ -81,13 +78,12 @@ class ManageControleTest extends TestCase
         $result = $this->createControle();
 
         $response = $this->actingAs($result['teacher']->user)->put(
-            route('controles.update',["controle"=>Controle::first()->id]),
-            ['year'=>2020]
+            route('controles.update', ["controle" => Controle::first()->id]),
+            ['year' => 2020]
         );
 
         $response->assertStatus(Response::HTTP_CREATED);
-        
-        $this->assertTrue(Controle::first()->year==2020);
-    }
 
+        $this->assertTrue(Controle::first()->year == 2020);
+    }
 }

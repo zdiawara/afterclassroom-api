@@ -33,25 +33,4 @@ class ClasseMatiere extends Model
     {
         return $this->belongsTo(Country::class);
     }
-
-    public function setClasseIdAttribute($code)
-    {
-        if (!is_null($code)) {
-            $this->attributes['classe_id'] = Classe::where("code", $code)->firstOrFail()->id;
-        }
-    }
-
-    public function setMatiereIdAttribute($code)
-    {
-        if (!is_null($code)) {
-            $this->attributes['matiere_id'] = Matiere::where("code", $code)->firstOrFail()->id;
-        }
-    }
-
-    public function setCountryIdAttribute($code)
-    {
-        if (!is_null($code)) {
-            $this->attributes['country_id'] = Country::where("code", $code)->firstOrFail()->id;
-        }
-    }
 }

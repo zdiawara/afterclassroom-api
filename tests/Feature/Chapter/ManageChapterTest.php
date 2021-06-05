@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Chapter;
 
+use App\Classe;
 use App\Chapter;
 use App\Matiere;
 use Tests\TestCase;
@@ -81,20 +82,12 @@ class ManageChapterTest extends TestCase
         $teacher = $this->createTeacher()['teacher'];
 
         $chapter = factory(Chapter::class)->make();
-        $this->addEnseignementDeps($chapter);
-
-        $chapter->teacher = $teacher->user->username;
-
+        $chapter->classe = factory(Classe::class)->create()->id;
+        $chapter->matiere =  factory(Matiere::class)->create()->id;
+        $chapter->teacher = $teacher->id;
         $response = $this->actingAs($teacher->user)->post(
             route('chapters.store'),
-            array_merge($chapter->toArray(), [
-                'matiere' => [
-                    'code' => $chapter->matiere
-                ],
-                'classe' => [
-                    'code' => $chapter->classe
-                ]
-            ])
+            $chapter->toArray()
         );
 
         $response->assertStatus(Response::HTTP_UNAUTHORIZED);
@@ -119,9 +112,7 @@ class ManageChapterTest extends TestCase
         $response = $this->actingAs($result['teacher']->user)->put(
             route('chapters.update', ['chapter' => $chapter->id]),
             [
-                "matiere" => [
-                    'code' =>  $matiere->code
-                ]
+                "matiere" => $matiere->id
             ]
         );
 

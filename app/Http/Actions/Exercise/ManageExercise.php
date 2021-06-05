@@ -31,7 +31,7 @@ class ManageExercise
         $chapter = $exercise->chapter;
 
         // verifie que le teacher peut enseigner la matiere
-        $this->teacherMatiereChecker->canTeach($chapter->teacher, $chapter->matiere, true);
+        $this->teacherMatiereChecker->canTeach($chapter->teacher_id, $chapter->matiere_id, true);
 
         $lastExercise = Exercise::where("chapter_id", $exercise->chapter_id)
             ->orderBy("position", "desc")
@@ -50,7 +50,7 @@ class ManageExercise
         $chapter = $exercise->chapter;
 
         // verifie que le teacher peut enseigner la matiere
-        $this->teacherMatiereChecker->canTeach($chapter->teacher, $chapter->matiere, !(isset($fields['active_correction']) || isset($fields['active_enonce'])));
+        $this->teacherMatiereChecker->canTeach($chapter->teacher_id, $chapter->matiere_id, !(isset($fields['active_correction']) || isset($fields['active_enonce'])));
 
         $exercise->update($fields);
 

@@ -29,11 +29,10 @@ class EnseignementChecker extends Checker
         if ($user->isTeacher()) {
             $teacherId = null;
             if ($model instanceof Exercise || $model instanceof Question) {
-                $teacherId = $model->chapter->teacher->id;
+                $teacherId = $model->chapter->teacher_id;
             } else {
                 $teacherId = $model->teacher_id;
             }
-
             if ($teacherId == $user->userable_id) {
                 return true;
             }

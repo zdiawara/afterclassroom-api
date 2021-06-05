@@ -2,12 +2,8 @@
 
 namespace Tests\Feature\Teacher;
 
-use App\User;
 use App\Teacher;
 use Tests\TestCase;
-use App\Referentiel;
-use App\Http\Resources\TeacherResource;
-use App\Http\Resources\ReferentielResource;
 use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
@@ -21,10 +17,10 @@ class TeacherManagementTest extends TestCase
         $this->withoutExceptionHandling();
 
         $result = $this->createTeacher();
-        
+
         $result['response']
             ->assertStatus(Response::HTTP_CREATED);
-            //->assertJsonFragment($this->decodeResource(new TeacherResource($teacher)));
+        //->assertJsonFragment($this->decodeResource(new TeacherResource($teacher)));
     }
 
 
@@ -33,12 +29,12 @@ class TeacherManagementTest extends TestCase
     {
         //$this->withoutExceptionHandling();
 
-        $result = $this->createTeacher();
-        
+        $this->createTeacher();
+
         $teacher = Teacher::First();
-               
+
         $response = $this->actingAs($teacher->user)->put(
-            route('teachers.update',["teacher"=>$teacher->id]),
+            route('teachers.update', ["teacher" => $teacher->id]),
             [
                 "firstname" => "Prenom 1",
                 "username" => 'zdiawara'
@@ -47,8 +43,8 @@ class TeacherManagementTest extends TestCase
 
         $response
             ->assertStatus(Response::HTTP_CREATED);
-            //->assertJsonFragment($this->decodeResource(new TeacherResource($teacher)));
-        $this->assertTrue(Teacher::first()->user->firstname==="Prenom 1");
+        //->assertJsonFragment($this->decodeResource(new TeacherResource($teacher)));
+        $this->assertTrue(Teacher::first()->user->firstname === "Prenom 1");
     }
 
     /** @test **/
@@ -56,16 +52,15 @@ class TeacherManagementTest extends TestCase
     {
         //$this->withoutExceptionHandling();
 
-        $teacher = factory(Teacher::class)->create();               
-        
-        $response = $this->actingAs(factory(Teacher::class)->create()->user)->put(
-            route('teachers.update',["teacher"=>$teacher->id]),
-            ["lastname"=>"lastname 1"]
+        $this->createTeacher();
+        $this->createTeacher();
+        $teachers = Teacher::all();
+
+        $response = $this->actingAs($teachers[0]->user)->put(
+            route('teachers.update', ["teacher" => $teachers[1]->id]),
+            ["lastname" => "lastname 1"]
         );
 
         $response->assertStatus(Response::HTTP_UNAUTHORIZED);
-    
     }
-
-
 }

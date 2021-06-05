@@ -14,12 +14,12 @@ class CreateCollegeYearsTable extends Migration
     public function up()
     {
         Schema::create('college_years', function (Blueprint $table) {
-            $table->id();
-            $table->string('name',50);
-            $table->year('year')->unique();
-            $table->unsignedBigInteger('etat_id');
+            $table->year("id")->primary();
+            $table->string('name', 50);
+            $table->dateTime('started_at');
+            $table->dateTime('finished_at');
             $table->timestamps();
-            $table->foreign('etat_id')->references('id')->on('referentiels');
+            // $table->foreign('etat_id')->references('id')->on('referentiels');
         });
     }
 
