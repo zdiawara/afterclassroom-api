@@ -79,8 +79,13 @@ class ListControle
     private function partiels(array $params)
     {
         $query = Controle::where('teacher_id', $params['teacher'])
-            ->where('trimestre_id', $params['trimestre'])
             ->orderBy('position', 'asc');
+        if (isset($params['year'])) {
+            $query = $query->where('year', $params['year']);
+        }
+        if (isset($params['trimestre'])) {
+            $query = $query->where('trimestre_id', $params['trimestre']);
+        }
         return ['query' => $query, 'teacher' => $params['teacher']];
     }
 }

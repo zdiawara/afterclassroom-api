@@ -2,22 +2,34 @@
 
 namespace App\Http\Actions\Checker;
 
-use App\Teacher;
 use App\Exercise;
 use App\Http\Actions\Checker\Checker;
 use Illuminate\Database\Eloquent\Model;
 use App\Http\Actions\Checker\UserChecker;
+use App\Http\Actions\MatiereTeacher\FindTeacherPrincipal;
+use App\Notion;
 use App\Question;
 
 class EnseignementChecker extends Checker
 {
 
 
-    private $userChecker;
+    private UserChecker $userChecker;
+    private FindTeacherPrincipal $findTeacherPrincipal;
 
-    public function __construct(UserChecker $userChecker)
+    public function __construct(UserChecker $userChecker, FindTeacherPrincipal $findTeacherPrincipal)
     {
         $this->userChecker = $userChecker;
+        $this->findTeacherPrincipal = $findTeacherPrincipal;
+    }
+
+    private function findNotionTeacher(Notion $notion)
+    {
+        $teacher = $this->findTeacherPrincipal->execute($notion->matiere_id, $notion->classe_id);
+        if (isset($teacher)) {
+            return $teacher->id;
+        }
+        return null;
     }
 
     private function createOrUpdate(Model $model)
@@ -28,8 +40,12 @@ class EnseignementChecker extends Checker
         // Enseignant
         if ($user->isTeacher()) {
             $teacherId = null;
-            if ($model instanceof Exercise || $model instanceof Question) {
+            if ($model instanceof Exercise) {
                 $teacherId = $model->chapter->teacher_id;
+            } else if ($model instanceof Question) {
+                $teacherId = $this->findNotionTeacher($model->notion);
+            } else if ($model instanceof Notion) {
+                $teacherId = $this->findNotionTeacher($model);
             } else {
                 $teacherId = $model->teacher_id;
             }

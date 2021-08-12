@@ -23,6 +23,7 @@ class CodeReferentiel
     const DEVOIR = "devoir";
     const COMPOSITION = "composition";
     const EXAMEN = "examen";
+    const REVISION = "revision";
 
     const BAC = "bac";
     const BEPC = "bepc";

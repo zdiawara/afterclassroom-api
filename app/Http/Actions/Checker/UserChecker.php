@@ -2,14 +2,7 @@
 
 namespace App\Http\Actions\Checker;
 
-use App\Book;
-use App\Chapter;
-use App\Content;
-use App\Controle;
-use App\Exercise;
-use App\Solution;
 use App\StudentTeacher;
-use App\Constants\CodeReferentiel;
 use App\Http\Actions\Checker\Checker;
 use Illuminate\Database\Eloquent\Model;
 
@@ -20,7 +13,7 @@ class UserChecker extends Checker
     /**
      * Verifie si l'ut peut acceder à un contenu inactif
      */
-    public function canReadInactive($username)
+    public function canReadInactive(string $username)
     {
         $user = auth()->userOrFail();
         if ($user->isTeacher()) {
@@ -47,7 +40,7 @@ class UserChecker extends Checker
     /**
      * Verifie si l'ut peut lire le contenu
      */
-    public function studentCanRead($user, $enseignement)
+    public function studentCanReadContent($user, $enseignement)
     {
         if (!isset($enseignement)) {
             return false;
@@ -70,7 +63,7 @@ class UserChecker extends Checker
         }
 
         if ($user->isStudent()) {
-            return $this->studentCanRead($user, $enseignement);
+            return $this->studentCanReadContent($user, $enseignement);
         } else if ($user->isTeacher() && $enseignement->teacher->user->username == $user->username) {
             return true;
         }

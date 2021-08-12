@@ -2,8 +2,8 @@
 
 namespace App\Http\Requests;
 
-use App\Rules\CheckChapter;
 use App\Http\Requests\CustumRequest;
+use App\Rules\CheckNotion;
 
 class QuestionRequest extends CustumRequest
 {
@@ -17,7 +17,7 @@ class QuestionRequest extends CustumRequest
     {
         $rules = [
             'title' => 'required',
-            'chapter' => ['required', new CheckChapter],
+            'notion' => ['required', new CheckNotion],
             'content.active' => 'boolean',
         ];
         return $this->makeRules(array_merge(

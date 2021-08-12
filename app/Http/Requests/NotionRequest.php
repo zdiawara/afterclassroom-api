@@ -2,10 +2,12 @@
 
 namespace App\Http\Requests;
 
+use App\Rules\CheckClasse;
+use App\Rules\CheckMatiere;
+use App\Rules\CheckSpecialite;
 use App\Http\Requests\CustumRequest;
-use App\Http\Requests\EnseignementRules;
 
-class ChapterRequest extends CustumRequest
+class NotionRequest extends CustumRequest
 {
     /**
      * Get the validation rules that apply to the request.
@@ -18,9 +20,12 @@ class ChapterRequest extends CustumRequest
             'title' => 'required|max:100',
             'resume' => 'max:255',
             'content.active' => 'boolean',
-            'accessible' => 'boolean',
-            'position' => 'integer'
+            'position' => 'integer',
+            'classe' => ['required', new CheckClasse],
+            'matiere' => ['required', new CheckMatiere],
+            'specialite' => [new CheckSpecialite],
+
         ];
-        return $this->makeRules(array_merge(EnseignementRules::getRules(), $rules));
+        return $this->makeRules($rules);
     }
 }

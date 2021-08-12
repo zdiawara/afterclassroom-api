@@ -16,15 +16,15 @@ class DocumentPlanTest extends TestCase
     {
 
         $plan = (new DocumentPlan())->execute('<div>
-            <h1>Titre 1</h1>
-            <h2>Titre 1.1</h2>
-            <h2>Titre 1.2</h2>
-            <h1>Titre 2</h1>
-            <h1>Titre 3</h1>
-            <h2>Titre 3.1 </h2>
+            <h2>Titre 1</h2>
+            <h3>Titre 1.1</h3>
+            <h3>Titre 1.2</h3>
+            <h2>Titre 2</h2>
+            <h2>Titre 3</h2>
+            <h3>Titre 3.1 </h3>
         </div>');
 
-        $this->assertTrue($plan == "<h1>Titre 1</h1><h1>Titre 2</h1><h1>Titre 3</h1>");
+        $this->assertTrue($plan == "<h2>Titre 1</h2><h2>Titre 2</h2><h2>Titre 3</h2>");
         $this->assertTrue((new DocumentPlan())->execute(null) == "");
     }
 }

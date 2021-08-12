@@ -7,6 +7,8 @@ use App\Http\Actions\Queries;
 use App\Http\Actions\Checker\UserChecker;
 use App\Http\Actions\Content\DataAccess;
 use App\Http\Actions\Content\ReadContent;
+use App\Http\Actions\MatiereTeacher\FindTeacherPrincipal;
+use App\Notion;
 
 class ListQuestion
 {
@@ -14,27 +16,34 @@ class ListQuestion
     private UserChecker $userChecker;
     private ReadContent $readContent;
     private DataAccess $dataAccess;
+    private FindTeacherPrincipal $findTeacherPrincipal;
 
-    public function __construct(UserChecker $userChecker, ReadContent $readContent, DataAccess $dataAccess)
-    {
+    public function __construct(
+        UserChecker $userChecker,
+        ReadContent $readContent,
+        DataAccess $dataAccess,
+        FindTeacherPrincipal $findTeacherPrincipal
+    ) {
         $this->userChecker = $userChecker;
         $this->readContent = $readContent;
         $this->dataAccess = $dataAccess;
+        $this->findTeacherPrincipal = $findTeacherPrincipal;
     }
 
-    public function byChapter(Chapter $chapter)
+    public function execute(Notion $notion)
     {
-        $teacher = $chapter->teacher_id;
 
-        $query = $chapter->questions();
+        $query = $notion->questions();
 
-        if (!$this->userChecker->canReadInactive($teacher)) {
+        $teacher = $this->findTeacherPrincipal->execute($notion->matiere_id, $notion->classe_id);
+
+        if (!isset($teacher) || !$this->userChecker->canReadInactive($teacher->id)) {
             $query = $query->where('is_active', 1);
         }
 
         $canReadQuestion = $this->dataAccess->canReadQuestion($teacher, [
-            "matiere" => $chapter->matiere_id,
-            "classe" => $chapter->classe_id
+            "matiere" => $notion->matiere_id,
+            "classe" => $notion->classe_id
         ]);
 
         $questions = Queries::of($query)

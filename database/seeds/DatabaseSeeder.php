@@ -12,7 +12,6 @@ use App\Identify;
 use App\Specialite;
 use App\CollegeYear;
 use App\Referentiel;
-use App\StudentTeacher;
 use App\ClasseMatiere;
 use App\Country;
 use Illuminate\Database\Seeder;
@@ -69,9 +68,9 @@ class DatabaseSeeder extends Seeder
 
         $this->generateClasseMatieres();
 
-        $this->createChapters();
+        /*$this->createChapters();
         $this->createQuestions();
-        $this->createExamens();
+        $this->createExamens();*/
     }
 
     private function generateClasseMatieres()
@@ -264,7 +263,8 @@ class DatabaseSeeder extends Seeder
         ///// Ajout referentiel controle
         $this->createReferentiel('Devoir', CodeReferentiel::DEVOIR, TypeReferentiel::CONTROLE, 1);
         $this->createReferentiel('Composition', CodeReferentiel::COMPOSITION, TypeReferentiel::CONTROLE, 2);
-        $this->createReferentiel('Examen', CodeReferentiel::EXAMEN, TypeReferentiel::CONTROLE, 3);
+        $this->createReferentiel('Révision', CodeReferentiel::REVISION, TypeReferentiel::CONTROLE, 3);
+        $this->createReferentiel('Examen', CodeReferentiel::EXAMEN, TypeReferentiel::CONTROLE, 4);
 
         $this->createReferentiel('1er trimestre', CodeReferentiel::TRIMESTRE_1, TypeReferentiel::TRIMESTRE, 1);
         $this->createReferentiel('2e trimestre', CodeReferentiel::TRIMESTRE_2, TypeReferentiel::TRIMESTRE, 2);
@@ -273,8 +273,8 @@ class DatabaseSeeder extends Seeder
         $this->createReferentiel('Sujet type examen', CodeReferentiel::TYPE_EXAMEN, TypeReferentiel::EXAMEN, 1);
         $this->createReferentiel("Sujet d'examen", CodeReferentiel::FINAL_EXAMEN, TypeReferentiel::EXAMEN, 2);
 
-        $this->createReferentiel("Exercice d'application", CodeReferentiel::APPLICATION, TypeReferentiel::EXERCISE, 1);
-        $this->createReferentiel('Exercice de synthèse', CodeReferentiel::SYNTHESE, TypeReferentiel::EXERCISE, 2);
+        $this->createReferentiel("Application", CodeReferentiel::APPLICATION, TypeReferentiel::EXERCISE, 1);
+        $this->createReferentiel('Synthèse', CodeReferentiel::SYNTHESE, TypeReferentiel::EXERCISE, 2);
 
         // Etat Justificatif
         $this->createReferentiel('En validation', CodeReferentiel::VALIDATING, TypeReferentiel::ETAT, 1);
@@ -286,15 +286,17 @@ class DatabaseSeeder extends Seeder
         $this->createReferentiel('FAQ', CodeReferentiel::FAQ, TypeReferentiel::ENSEIGNEMENT, 2);
         $this->createReferentiel('Sujet d\'examen', CodeReferentiel::EXAM_SUBJECT, TypeReferentiel::ENSEIGNEMENT, 3);
 
-        $year = date('Y', strtotime(now()));
-
-        $started = new DateTime($year - 1 . '-08-01');
-        CollegeYear::create([
-            'name' => ($year - 1) . '-' . $year,
-            'id' => $year,
-            'started_at' => date('Y-m-d H:m:s', $started->getTimestamp()),
-            'finished_at' => date('Y-m-d H:m:s', $started->add(new DateInterval('P1Y'))->getTimestamp())
-        ]);
+        $base = date('Y', strtotime(now()));
+        for ($i = 0; $i < 20; $i++) {
+            $year = $base - $i;
+            $started = new DateTime($year - 1 . '-08-01');
+            CollegeYear::create([
+                'name' => ($year - 1) . '-' . $year,
+                'id' => $year,
+                'started_at' => date('Y-m-d H:m:s', $started->getTimestamp()),
+                'finished_at' => date('Y-m-d H:m:s', $started->add(new DateInterval('P1Y'))->getTimestamp())
+            ]);
+        }
     }
 
     private function createReferentiel($name, $code, $type, $position)

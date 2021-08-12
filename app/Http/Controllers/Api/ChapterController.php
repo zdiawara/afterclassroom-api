@@ -11,11 +11,10 @@ use App\Http\Actions\Chapter\ShowChapter;
 use App\Http\Requests\ListChapterRequest;
 use App\Http\Resources\ChapterCollection;
 use App\Http\Resources\ExerciseCollection;
-use App\Http\Resources\QuestionCollection;
 use App\Http\Actions\Chapter\ManageChapter;
 use App\Http\Actions\Chapter\ListChapter;
+use App\Http\Actions\Content\DocumentPlan;
 use App\Http\Actions\Exercise\ListExercise;
-use App\Http\Actions\Question\ListQuestion;
 
 class ChapterController extends Controller
 {
@@ -69,14 +68,6 @@ class ChapterController extends Controller
         return new ExerciseCollection($listExercise->byChapter($chapter));
     }
 
-    /**
-     * Affiche toutes les questions d'un chapitre
-     */
-    public function showQuestions(Chapter $chapter, ListQuestion $listQuestion)
-    {
-        return new QuestionCollection($listQuestion->byChapter($chapter));
-    }
-
     // charge les dependences liées au professeur
     private function loadDependences(Chapter $chapter)
     {
@@ -90,13 +81,14 @@ class ChapterController extends Controller
         if ($content) {
             if (isset($content['data'])) {
                 $data['content'] = $content['data'];
+                $data['toc'] = (new DocumentPlan())->execute($content['data']);
             }
             if (isset($content['active'])) {
                 $data['is_active'] = $content['active'];
             }
         }
-        if ($request->has('public')) {
-            $data['is_public'] = $request->get('public');
+        if ($request->has('accessible')) {
+            $data['is_public'] = $request->get('accessible');
         }
         return $data;
     }

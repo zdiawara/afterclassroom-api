@@ -19,9 +19,9 @@ class CreateQuestionsTable extends Migration
             $table->longText('content')->nullable();
             $table->boolean('is_active')->default(false);
             $table->boolean('is_public')->default(true);
-            $table->uuid('chapter_id');
+            $table->uuid('notion_id');
             $table->timestamps();
-            $table->foreign('chapter_id')->references('id')->on('chapters');
+            $table->foreign('notion_id')->references('id')->on('notions');
         });
     }
 

@@ -20,7 +20,7 @@ class ChapterResource extends EnseignementResource
                 'title' => $this->title,
                 'resume' => $this->resume,
                 'position' => $this->position,
-                "public" => (string) $this->is_public,
+                "accessible" => (string) $this->is_public,
                 "toc" => (string) $this->toc,
                 'content' => [
                     "data" => $this->content,

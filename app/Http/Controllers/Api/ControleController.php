@@ -2,12 +2,13 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\CollegeYear;
+use App\Constants\CodeReferentiel;
 use App\Matiere;
 use App\Controle;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\ControleRequest;
 use App\Http\Resources\ControleResource;
-use App\Http\Actions\Checker\UserChecker;
 use App\Http\Resources\ControleCollection;
 use App\Http\Actions\Checker\EnseignementChecker;
 use App\Http\Actions\Checker\TeacherMatiereChecker;
@@ -31,7 +32,7 @@ class ControleController extends Controller
     public function index(ListControleRequest $request, ListControle $listControle)
     {
         $type = $request->get('type');
-        $params = $request->only(['classe', 'trimestre', 'matiere', 'teacher']);
+        $params = $request->only(['classe', 'trimestre', 'matiere', 'teacher', 'year']);
         return new ControleCollection($listControle->execute($type, $params));
     }
 

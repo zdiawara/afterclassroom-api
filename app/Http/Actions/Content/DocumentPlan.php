@@ -17,7 +17,7 @@ class DocumentPlan
 
         $doc = new DOMDocument("1.0", "utf-8");
         $doc->loadHTML('<?xml encoding="utf-8" ?>' . $data);
-        $headers = $doc->getElementsByTagName('h1');
+        $headers = $doc->getElementsByTagName('h2');
         $content = "";
         for ($i = 0; $i < $headers->length; $i++) {
             $content .= $doc->saveHTML($headers[$i]);

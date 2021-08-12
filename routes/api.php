@@ -52,6 +52,11 @@ Route::group(['prefix' => 'chapters'], function () {
     Route::get('/{chapter}/questions', 'Api\ChapterController@showQuestions')->name('chapters.showQuestions');
 });
 
+Route::apiResource('notions', "Api\NotionController");
+Route::group(['prefix' => 'notions'], function () {
+    Route::get('/{notion}/questions', 'Api\NotionController@showQuestions')->name('notions.showQuestions');
+});
+
 // Exercise
 Route::apiResource('exercises', "Api\ExerciseController");
 // Question

@@ -22,7 +22,7 @@ class ControleResource extends EnseignementResource
             'type' => new ReferentielResource($this->whenLoaded('type')),
             'trimestre' => new ReferentielResource($this->whenLoaded('trimestre')),
             'position' => $this->position,
-            'public' => (string) $this->is_public,
+            'accessible' => (string) $this->is_public,
             'updated' => $this->updated_at,
             'created' => $this->created_at,
         ];
