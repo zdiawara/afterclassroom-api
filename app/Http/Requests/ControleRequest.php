@@ -24,6 +24,7 @@ class ControleRequest extends CustumRequest
             'trimestre' => ['required_if:type,devoir,composition', new CheckTrimestre],
             'enonce.active' => 'boolean',
             'correction.active' => 'boolean',
+            'accessible' => 'boolean',
         ];
         return $this->makeRules(array_merge(EnseignementRules::getRules(), $rules));
     }

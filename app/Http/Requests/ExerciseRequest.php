@@ -23,6 +23,7 @@ class ExerciseRequest extends CustumRequest
             'public' => 'boolean',
             'enonce.active' => 'boolean',
             'correction.active' => 'boolean',
+            'accessible' => 'boolean',
         ];
         return $this->makeRules(array_merge($rules));
     }

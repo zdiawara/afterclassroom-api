@@ -69,6 +69,7 @@ Route::apiResource('controles', "Api\ControleController");
 // College year
 Route::group(['prefix' => 'college_years'], function ($router) {
     Route::get('/', 'Api\CollegeYearController@index')->name('college_years.index');
+    Route::post('/', 'Api\CollegeYearController@store')->name('college_years.store');
 });
 
 /////

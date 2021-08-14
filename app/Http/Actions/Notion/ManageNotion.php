@@ -37,7 +37,7 @@ class ManageNotion
 
     public function update(Notion $notion, array $fields)
     {
-        // Verifie que l'ut connecté peut modifier la notion
+        // Verifie que l'ut connecté peut modifier la notion 
         $this->enseignementChecker->canUpdate($notion);
 
         $notion->update($fields);
