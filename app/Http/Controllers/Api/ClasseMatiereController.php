@@ -2,11 +2,10 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Matiere;
 use App\ClasseMatiere;
+use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\ClasseMatiereResource;
-use App\Http\Resources\MatiereResource;
 
 class ClasseMatiereController extends Controller
 {
@@ -16,14 +15,24 @@ class ClasseMatiereController extends Controller
     {
     }
 
-    public function index(Matiere $matiere)
+    public function index(Request $request)
     {
-        $matiere->load('specialites');
-
-        $classeMatieres = ClasseMatiere::where('matiere_id', $matiere->id)
-            ->with(['classe', 'teacher'])
+        $classeMatieres = ClasseMatiere::where(function ($query) use ($request) {
+            if ($request->has('matiere')) {
+                $query->where('matiere_id', $request->get('matiere'));
+            }
+        })->where(function ($query) use ($request) {
+            if ($request->has('classe')) {
+                $query->where('classe_id', $request->get('classe'));
+            }
+        })->where(function ($query) use ($request) {
+            if ($request->has('teacher')) {
+                $query->where('teacher_id', $request->get('teacher'));
+            }
+        })
+            ->with(['classe', 'teacher', 'matiere'])
             ->get();
-        return ClasseMatiereResource::collection($classeMatieres)
-            ->additional(['matiere' => new MatiereResource($matiere)]);
+
+        return ClasseMatiereResource::collection($classeMatieres);
     }
 }

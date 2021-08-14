@@ -33,6 +33,11 @@ class Teacher extends Model
         return $this->belongsToMany(Matiere::class, 'teacher_matiere')->withTimestamps();;
     }
 
+    public function writers()
+    {
+        return $this->belongsToMany(Writer::class, 'teacher_writer')->withTimestamps();;
+    }
+
     public function TeacherMatieres()
     {
         return $this->hasMany(TeacherMatiere::class);

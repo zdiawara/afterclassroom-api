@@ -34,7 +34,7 @@ class ShowChapter
             "matiere" => $chapter->matiere_id,
             "classe" => $chapter->classe_id,
         ];
-        $canReadContent = $this->dataAccess->canReadContent($teacher, $params);
-        return $this->readContent->byChapter($chapter, $canReadContent);
+        $canAccessContent = $this->dataAccess->canAccessContent($teacher, $params);
+        return $this->readContent->byChapter($chapter, $canAccessContent);
     }
 }

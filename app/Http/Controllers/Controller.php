@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Classe;
+use App\Http\Requests\ControleRequest;
 use App\Http\Requests\QuestionRequest;
 use App\Exceptions\BadRequestException;
 use Illuminate\Foundation\Bus\DispatchesJobs;
@@ -87,7 +88,7 @@ class Controller extends BaseController
         return $fields;
     }
 
-    protected function extractControleFields(Request $request)
+    protected function extractControleFields(ControleRequest $request)
     {
 
         $fields =  array_merge(
@@ -105,8 +106,8 @@ class Controller extends BaseController
         if ($request->has('trimestre')) {
             $fields['trimestre_id'] = $request->get('trimestre');
         }
-        if ($request->has('subject')) {
-            $fields['subject_id'] = $request->get('subject');
+        if ($request->has('session')) {
+            $fields['session_id'] = $request->get('session');
         }
         return $fields;
     }

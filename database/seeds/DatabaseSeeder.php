@@ -276,6 +276,9 @@ class DatabaseSeeder extends Seeder
         $this->createReferentiel("Application", CodeReferentiel::APPLICATION, TypeReferentiel::EXERCISE, 1);
         $this->createReferentiel('Synthèse', CodeReferentiel::SYNTHESE, TypeReferentiel::EXERCISE, 2);
 
+        $this->createReferentiel('1ère session', CodeReferentiel::SESSION_1, TypeReferentiel::SESSION, 1);
+        $this->createReferentiel('2e session', CodeReferentiel::SESSION_2, TypeReferentiel::SESSION, 2);
+
         // Etat Justificatif
         $this->createReferentiel('En validation', CodeReferentiel::VALIDATING, TypeReferentiel::ETAT, 1);
         $this->createReferentiel('Validé', CodeReferentiel::VALIDATED, TypeReferentiel::ETAT, 2);
@@ -286,8 +289,8 @@ class DatabaseSeeder extends Seeder
         $this->createReferentiel('FAQ', CodeReferentiel::FAQ, TypeReferentiel::ENSEIGNEMENT, 2);
         $this->createReferentiel('Sujet d\'examen', CodeReferentiel::EXAM_SUBJECT, TypeReferentiel::ENSEIGNEMENT, 3);
 
-        $base = date('Y', strtotime(now()));
-        for ($i = 0; $i < 20; $i++) {
+        $base = 2022; //date('Y', strtotime(now()));
+        for ($i = 0; $i < 1; $i++) {
             $year = $base - $i;
             $started = new DateTime($year - 1 . '-08-01');
             CollegeYear::create([

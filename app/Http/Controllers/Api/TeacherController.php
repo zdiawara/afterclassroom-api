@@ -19,7 +19,7 @@ use App\Http\Actions\User\ManageIdentify;
 use App\Http\Requests\ListTeacherRequest;
 use Symfony\Component\HttpFoundation\Request;
 use App\Http\Actions\Teacher\CountTeacherEnseignement;
-
+use App\Http\Resources\WriterResource;
 
 class TeacherController extends Controller
 {
@@ -28,7 +28,7 @@ class TeacherController extends Controller
 
     public function __construct(UserChecker $userChecker, UserField $userField)
     {
-        $this->middleware('auth:api', ['except' => ['store']]);
+        //$this->middleware('auth:api', ['except' => ['store']]);
         $this->userChecker = $userChecker;
         $this->userField = $userField;
     }
@@ -104,6 +104,11 @@ class TeacherController extends Controller
         return $this->createdResponse(new TeacherResource($teacher));
     }
 
+    public function writers(Teacher $teacher)
+    {
+        return WriterResource::collection($teacher->writers()->get());
+    }
+
     public function updateAvatar(Request $request, Teacher $teacher, ManageUser $manageUser)
     {
         $manageUser->updateAvatar($teacher->user, $request);
@@ -116,5 +121,13 @@ class TeacherController extends Controller
         return $this->createdResponse(new TeacherResource(
             Teacher::where('id', $teacher->id)->withCount($countTeacherEnseignement->execute($request))->first()
         ));
+    }
+
+    public function show(Teacher $teacher)
+    {
+        $teacher['teacher_matieres'] = TeacherMatiere::where('teacher_id', $teacher->id)
+            ->with(['matiere.specialites', 'etat', 'level'])
+            ->get();
+        return new TeacherResource($teacher);
     }
 }

@@ -10,10 +10,10 @@ use Illuminate\Http\Resources\Json\JsonResource;
 
 class EnseignementResource extends JsonResource
 {
-    public function canReadContent()
+    public function canAccessContent()
     {
         return $this->is_public || (new UserChecker)
-            ->canReadContent(auth()->userOrFail(), $this);
+            ->canAccessContent(auth()->userOrFail(), $this);
     }
 
     /**

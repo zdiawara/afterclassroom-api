@@ -58,4 +58,11 @@ class ManageExercise
 
         return $exercise;
     }
+
+    public function updatePositions(array $fields)
+    {
+        for ($i = 0; $i < sizeof($fields); $i++) {
+            Exercise::where('id', $fields[$i]['id'])->update(['position' => $fields[$i]['position']]);
+        }
+    }
 }

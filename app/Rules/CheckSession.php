@@ -6,7 +6,7 @@ use App\Referentiel;
 use App\Constants\TypeReferentiel;
 use Illuminate\Contracts\Validation\Rule;
 
-class CheckTrimestre implements Rule
+class CheckSession implements Rule
 {
     /**
      * Create a new rule instance.
@@ -29,7 +29,7 @@ class CheckTrimestre implements Rule
     {
         if (isset($id)) {
             $referentiel = Referentiel::find($id);
-            return isset($referentiel) && $referentiel->type == TypeReferentiel::TRIMESTRE;
+            return isset($referentiel) && $referentiel->type == TypeReferentiel::SESSION;
         }
         return true;
     }
@@ -41,6 +41,6 @@ class CheckTrimestre implements Rule
      */
     public function message()
     {
-        return "Ce trimestre n'est pas prise en charge";
+        return "Cette session n'est pas prise en charge";
     }
 }

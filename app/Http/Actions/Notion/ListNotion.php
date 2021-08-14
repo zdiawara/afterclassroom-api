@@ -8,7 +8,7 @@ use App\Http\Actions\Checker\UserChecker;
 
 class ListNotion
 {
-
+    //
     private UserChecker $userChecker;
 
     public function __construct(UserChecker $userChecker)

@@ -21,6 +21,7 @@ class ControleResource extends EnseignementResource
             'year' => $this->year,
             'type' => new ReferentielResource($this->whenLoaded('type')),
             'trimestre' => new ReferentielResource($this->whenLoaded('trimestre')),
+            'session' => new ReferentielResource($this->whenLoaded('session')),
             'position' => $this->position,
             'accessible' => (string) $this->is_public,
             'updated' => $this->updated_at,

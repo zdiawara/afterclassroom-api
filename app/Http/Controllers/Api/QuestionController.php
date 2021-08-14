@@ -56,7 +56,7 @@ class QuestionController extends Controller
     /**
      * 
      */
-    public function update(QuestionRequest $request, Question $question,  ManageQuestion $manageQuestion)
+    public function update(QuestionRequest $request, Question $question, ManageQuestion $manageQuestion)
     {
 
         // Verifie que l'ut connecté peut modifier la question

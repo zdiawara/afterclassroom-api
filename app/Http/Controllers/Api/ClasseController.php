@@ -21,7 +21,7 @@ class ClasseController extends Controller
 
     public function index()
     {
-        return ClasseResource::collection(Classe::with('level')->get());
+        return ClasseResource::collection(Classe::with('level')->orderBy('position', 'asc')->get());
     }
 
     public function showMatieres(Classe $classe)

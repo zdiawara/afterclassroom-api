@@ -40,7 +40,7 @@ class UserChecker extends Checker
     /**
      * Verifie si l'ut peut lire le contenu
      */
-    public function studentCanReadContent($user, $enseignement)
+    public function studentcanAccessContent($user, $enseignement)
     {
         if (!isset($enseignement)) {
             return false;
@@ -55,7 +55,7 @@ class UserChecker extends Checker
     /**
      * Verifie si l'ut peut lire le contenu
      */
-    public function canReadContent($user, $enseignement)
+    public function canAccessContent($user, $enseignement)
     {
         // User
         if (!isset($user)) {
@@ -63,7 +63,7 @@ class UserChecker extends Checker
         }
 
         if ($user->isStudent()) {
-            return $this->studentCanReadContent($user, $enseignement);
+            return $this->studentcanAccessContent($user, $enseignement);
         } else if ($user->isTeacher() && $enseignement->teacher->user->username == $user->username) {
             return true;
         }

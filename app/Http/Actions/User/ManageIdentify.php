@@ -4,8 +4,9 @@ namespace App\Http\Actions\User;
 
 use App\Identify;
 
-class ManageIdentify{
-    
+class ManageIdentify
+{
+
     private const MAX = 999;
 
     private const KEY = "ACDFPMSTUYZ";
@@ -14,11 +15,12 @@ class ManageIdentify{
     {
     }
 
-    public function buildIdentify(){
+    public function buildIdentify()
+    {
 
         $identify = Identify::firstOrFail();
-        
-        if($identify->current > self::MAX || $identify->current < 0){
+
+        if ($identify->current > self::MAX || $identify->current < 0) {
             $identify->current = 0;
         }
 
@@ -26,17 +28,15 @@ class ManageIdentify{
 
         $modulo = $numero % 11;
 
-        if($identify->current === self::MAX){
+        if ($identify->current === self::MAX) {
             $identify->tranche += 1;
             $identify->current = 0;
-        }else{
-            $identify->current += 1 ;
+        } else {
+            $identify->current += 1;
         }
-        
+
         $identify->save();
 
-        return $numero.self::KEY[$modulo];
-
+        return $numero . self::KEY[$modulo];
     }
-
 }

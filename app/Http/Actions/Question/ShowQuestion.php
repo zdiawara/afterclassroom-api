@@ -25,7 +25,7 @@ class ShowChapter
     public function execute(Chapter $chapter)
     {
         $this->enseignementChecker->checkCanReadInactive($chapter->is_active, $chapter->teacher_id);
-        $canReadContent = false;
-        return $this->readContent->byChapter($chapter, $canReadContent);
+        $canAccessContent = false;
+        return $this->readContent->byChapter($chapter, $canAccessContent);
     }
 }

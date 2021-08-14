@@ -20,4 +20,9 @@ class Controle extends Enseignement
     {
         return $this->belongsTo(Referentiel::class);
     }
+
+    public function session()
+    {
+        return $this->belongsTo(Referentiel::class);
+    }
 }

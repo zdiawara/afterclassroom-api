@@ -20,6 +20,9 @@ class TeacherResource extends UserResource
         $user = parent::toArray($request);
 
         $user['role'] = UserRole::TEACHER;
+        if (isset($this->teacher_writers)) {
+            $user['writers'] = WriterResource::collection($this->writers);
+        }
         if ($this->teacher_matieres) {
             $user['matieres'] = TeacherMatiereResource::collection($this->teacher_matieres);
         }

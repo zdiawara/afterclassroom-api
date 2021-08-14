@@ -16,7 +16,8 @@ class NotionResource extends EnseignementResource
             parent::toArray($request),
             [
                 'title' => $this->title,
-                'active' => (string) $this->is_active
+                'active' => (string) $this->is_active,
+                'position' => $this->position
             ]
         );
     }

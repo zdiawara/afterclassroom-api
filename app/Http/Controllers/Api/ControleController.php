@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\CollegeYear;
 use App\Constants\CodeReferentiel;
 use App\Matiere;
 use App\Controle;
@@ -32,7 +31,7 @@ class ControleController extends Controller
     public function index(ListControleRequest $request, ListControle $listControle)
     {
         $type = $request->get('type');
-        $params = $request->only(['classe', 'trimestre', 'matiere', 'teacher', 'year']);
+        $params = $request->only(['classe', 'trimestre', 'matiere', 'teacher', 'year', 'session']);
         return new ControleCollection($listControle->execute($type, $params));
     }
 
@@ -43,6 +42,15 @@ class ControleController extends Controller
         $fields = $this->extractEnseignementFields($request);
 
         $controle = new Controle(array_merge($this->extractControleFields($request), $fields));
+
+        if ($controle->type_id === CodeReferentiel::EXAMEN) {
+            $exist = Controle::where('year', $controle->year)
+                ->where('session_id', $controle->session_id)
+                ->get();
+            if (isset($exist)) {
+                return $this->conflictResponse("Ce sujet d'examen existe déjà.");
+            }
+        }
 
         // Verifie que l'ut peut crée le controle
         $this->enseignementChecker->canCreate($controle);

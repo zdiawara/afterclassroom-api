@@ -43,24 +43,24 @@ class ListControle
             ->addClasse($params)
             ->addTypeControle($type)
             ->addEnonceActive($canReadInactive)
-            ->with(['type', 'trimestre'])
+            ->with(['type', 'trimestre', 'session'])
             ->get();
 
-        $canReadContent = $this->dataAccess->canReadContent($base['teacher'], $params);
+        $canAccessContent = $this->dataAccess->canAccessContent($base['teacher'], $params);
 
         $listControles = $controles->map(
             fn ($controle) => $this->readContent
-                ->byControle($controle, $canReadContent)
+                ->byControle($controle, $canAccessContent)
         );
 
-        if ($canReadContent) {
+        if ($canAccessContent) {
             return $listControles;
         }
 
-        // traiter les cas où la correction est inactifs
+        // traiter les cas où la correction est inactif
         return $listControles
-            ->map(function ($exercise) {
-                if (!$exercise->is_correction_active) {
+            ->map(function ($exercise) use ($canReadInactive) {
+                if (!$canReadInactive && !$exercise->is_correction_active) {
                     $exercise->correction = "Ce contenu est inactif.";
                 }
                 return $exercise;

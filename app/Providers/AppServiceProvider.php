@@ -33,6 +33,7 @@ class AppServiceProvider extends ServiceProvider
             'examen' => 'App\Examen',
             'student' => 'App\Student',
             'teacher' => 'App\Teacher',
+            'writer' => 'App\Writer',
             'admin' => 'App\Admin',
             'chapter' => 'App\Chapter',
             'bookclasse' => 'App\BookClasse'

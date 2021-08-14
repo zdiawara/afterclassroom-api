@@ -34,9 +34,9 @@ class ShowExercise
 
         $params = ["matiere" => $chapter->matiere_id, "classe" => $chapter->classe_id,];
 
-        $canReadContent = $this->dataAccess->canReadContent($teacher, $params);
+        $canAccessContent = $this->dataAccess->canAccessContent($teacher, $params);
 
-        $_exercise = $this->readContent->byExercise($exercise, $canReadContent);
+        $_exercise = $this->readContent->byExercise($exercise, $canAccessContent);
 
         if (!$exercise->is_correction_active && !$this->userChecker->canReadInactive($teacher)) {
             $_exercise->correction = "Contenu desactivé pour le moment";

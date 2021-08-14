@@ -41,7 +41,7 @@ class ListQuestion
             $query = $query->where('is_active', 1);
         }
 
-        $canReadQuestion = $this->dataAccess->canReadQuestion($teacher, [
+        $canAccessQuestion = $this->dataAccess->canAccessQuestion($teacher, [
             "matiere" => $notion->matiere_id,
             "classe" => $notion->classe_id
         ]);
@@ -50,6 +50,6 @@ class ListQuestion
             //->orderByPosition()
             ->get();
 
-        return $questions->map(fn ($question) => $this->readContent->byQuestion($question, $canReadQuestion));
+        return $questions->map(fn ($question) => $this->readContent->byQuestion($question, $canAccessQuestion));
     }
 }

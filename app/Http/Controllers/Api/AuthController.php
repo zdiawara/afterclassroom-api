@@ -8,6 +8,7 @@ use App\Http\Resources\StudentResource;
 use App\Http\Resources\TeacherResource;
 use Symfony\Component\HttpFoundation\Response;
 use App\Http\Actions\Student\StudentDetail;
+use App\Http\Resources\WriterResource;
 
 class AuthController extends Controller
 {
@@ -56,11 +57,16 @@ class AuthController extends Controller
             $teacher['teacher_matieres'] = TeacherMatiere::where('teacher_id', $teacher->id)
                 ->with(['matiere.specialites', 'etat', 'level'])
                 ->get();
-
+            // $teacher['teacher_writers'] = $teacher->writers()->get();
             return new TeacherResource($teacher);
         }
         if ($user->isStudent()) {
             return new StudentResource($studentDetail->execute($user->userable));
+        }
+        if ($user->isWriter()) {
+            $writer = $user->userable;
+            // $writer['teachers'] = $writer->teachers()->get();
+            return new WriterResource($writer);
         }
         return response()->json(auth()->user());
     }
