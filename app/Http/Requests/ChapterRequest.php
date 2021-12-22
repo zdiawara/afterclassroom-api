@@ -18,6 +18,7 @@ class ChapterRequest extends CustumRequest
             'title' => 'required|max:100',
             'resume' => 'max:255',
             'content.active' => 'boolean',
+            'accessible' => 'boolean',
             'position' => 'integer'
         ];
         return $this->makeRules(array_merge(EnseignementRules::getRules(), $rules));

@@ -21,15 +21,8 @@ class Question extends Model
     }
 
     //
-    public function chapter()
+    public function notion()
     {
-        return $this->belongsTo(Chapter::class);
-    }
-
-    public function setChapterIdAttribute($id)
-    {
-        if (!is_null($id)) {
-            $this->attributes['chapter_id'] = Chapter::findOrFail($id)->id;
-        }
+        return $this->belongsTo(Notion::class);
     }
 }

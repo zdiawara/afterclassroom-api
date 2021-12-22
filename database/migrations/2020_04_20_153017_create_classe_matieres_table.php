@@ -14,6 +14,7 @@ class CreateClasseMatieresTable extends Migration
     public function up()
     {
         Schema::create('classe_matiere', function (Blueprint $table) {
+            $table->increments('id');
             $table->string('classe_id');
             $table->string('matiere_id');
             $table->string('country_id');

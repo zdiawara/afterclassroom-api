@@ -15,6 +15,7 @@ class TypeReferentiel
     const ETAT_COLLEGE_YEAR = "etat_college_year";
     const GENDER = "gender";
     const TRIMESTRE = "trimestre";
+    const SESSION = "session";
     const EXAMEN = "examen";
     const ENSEIGNEMENT = "enseignement";
 }

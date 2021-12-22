@@ -17,12 +17,12 @@ class QuestionResource extends JsonResource
         return [
             'id' => (string) $this->id,
             'title' => $this->title,
-            "public" => (string) $this->is_public,
+            "accessible" => (string) $this->is_public,
             'content' => [
                 "data" => $this->content,
                 'active' => (string) $this->is_active,
             ],
-            'chapter' => new NotionResource($this->whenLoaded('chapter')),
+            'notion' => new NotionResource($this->whenLoaded('notion')),
             'updated' => $this->updated_at,
             'created' => $this->created_at
         ];

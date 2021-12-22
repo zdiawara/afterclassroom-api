@@ -36,13 +36,15 @@ class ListExercise
             ->addEnonceActive($canReadInactive)
             ->get();
 
-        $canReadContent = $this->dataAccess->canReadContent($teacher, [
+        $canAccessContent = $this->dataAccess->canAccessContent($teacher, [
             "matiere" => $chapter->matiere_id,
             "classe" => $chapter->classe_id
         ]);
 
+        $canReadInactive = $this->userChecker->canReadInactive($teacher);
+
         // traiter les cas où la correction est inactifs
-        if (!$canReadContent) {
+        if (!$canReadInactive) {
             $exercises = $exercises
                 ->map(function ($exercise) {
                     if (!$exercise->is_correction_active) {
@@ -52,7 +54,7 @@ class ListExercise
                 });
         }
 
-        $exercises = $exercises->map(fn ($exercise) => $this->readContent->byExercise($exercise, $canReadContent));
+        $exercises = $exercises->map(fn ($exercise) => $this->readContent->byExercise($exercise, $canAccessContent));
 
         return $exercises;
     }

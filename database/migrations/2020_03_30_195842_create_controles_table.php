@@ -16,7 +16,6 @@ class CreateControlesTable extends Migration
         Schema::create('controles', function (Blueprint $table) {
             $table->uuid("id")->primary();
             $table->smallInteger('position')->default(1);
-            $table->year('year');
             $table->boolean('is_public')->default(true);
             $table->longText('enonce')->nullable();
             $table->boolean('is_enonce_active')->default(false);;
@@ -29,13 +28,15 @@ class CreateControlesTable extends Migration
             $table->string('specialite_id')->nullable();
 
             $table->string('type_id');
+            $table->year('year')->nullable();
             $table->string('trimestre_id')->nullable();
-
+            $table->string('session_id')->nullable();
 
             $table->timestamps();
 
             $table->foreign('type_id')->references('id')->on('referentiels');
             $table->foreign('trimestre_id')->references('id')->on('referentiels');
+            $table->foreign('session_id')->references('id')->on('referentiels');
             $table->foreign('teacher_id')->references('id')->on('teachers');
             $table->foreign('classe_id')->references('id')->on('classes');
             $table->foreign('specialite_id')->references('id')->on('specialites');

@@ -23,6 +23,7 @@ class ClasseResource extends JsonResource
             'isExamClass' => (string) $this->is_exam_class,
             'level' => new ReferentielResource($this->whenLoaded('level')),
             'matieres' => MatiereResource::collection($this->whenLoaded('matieres')),
+            'teacher' => new TeacherResource($this->whenLoaded('teacher')),
         ];
     }
 }

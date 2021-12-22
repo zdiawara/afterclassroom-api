@@ -37,7 +37,7 @@ class ListChapter
             ->addClasse($params)
             ->orderByPosition()
             ->get();
-        $canReadContent = $this->dataAccess->canReadContent($teacher, $params);
-        return $chapters->map(fn ($chapter) => $this->readContent->byChapter($chapter, $canReadContent));
+        $canAccessContent = $this->dataAccess->canAccessContent($teacher, $params);
+        return $chapters->map(fn ($chapter) => $this->readContent->byChapter($chapter, $canAccessContent));
     }
 }

@@ -15,4 +15,11 @@ class CollegeYear extends Model
     {
         return $this->belongsTo(Referentiel::class);
     }
+
+    public function isInProgress()
+    {
+        $date = strtotime(now());
+        return strtotime($this->started_at) <= $date &&
+            strtotime($this->finished_at) >= $date;
+    }
 }

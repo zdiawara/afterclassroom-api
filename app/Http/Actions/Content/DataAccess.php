@@ -3,7 +3,6 @@
 namespace App\Http\Actions\Content;
 
 use App\Constants\CodeReferentiel;
-use App\Http\Actions\Student\FindStudentTeacher;
 use App\Http\Actions\Subscription\HasSubscription;
 
 class DataAccess
@@ -16,22 +15,22 @@ class DataAccess
         $this->hasSubscription = $hasSubscription;
     }
 
-    public function canReadContent(string $teacherId, array $paramsIds = [])
+    public function canAccessContent(string $teacherId, array $paramsIds = [])
     {
-        return $this->canRead(CodeReferentiel::BASIC, $teacherId, $paramsIds);
+        return $this->canAccess(CodeReferentiel::BASIC, $teacherId, $paramsIds);
     }
 
-    public function canReadQuestion(string $teacher, array $params = [])
+    public function canAccessQuestion(string $teacher, array $params = [])
     {
-        return $this->canRead(CodeReferentiel::FAQ, $teacher, $params);
+        return $this->canAccess(CodeReferentiel::FAQ, $teacher, $params);
     }
 
-    public function canReadExamSubject(string $teacher, array $params = [])
+    public function canAccessExamSubject(string $teacher, array $params = [])
     {
-        return $this->canRead(CodeReferentiel::EXAM_SUBJECT, $teacher, $params);
+        return $this->canAccess(CodeReferentiel::EXAM_SUBJECT, $teacher, $params);
     }
 
-    private function canRead(string $enseignement, string $teacherId, array $paramsIds = [])
+    private function canAccess(string $enseignement, string $teacherId, array $paramsIds = [])
     {
         $user = auth()->userOrFail();
         if ($user->isTeacher() && $user->isOwner($teacherId)) {

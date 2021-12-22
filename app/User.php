@@ -67,6 +67,11 @@ class User  extends Authenticatable implements JWTSubject
         return $this->userable instanceof Teacher;
     }
 
+    public function isWriter()
+    {
+        return $this->userable instanceof Writer;
+    }
+
     public function isStudent()
     {
         return $this->userable instanceof Student;

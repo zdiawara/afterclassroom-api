@@ -17,8 +17,14 @@ class Classe extends Model
         return $this->belongsTo(Referentiel::class);
     }
 
+    public function teacher()
+    {
+        return $this->belongsTo(Teacher::class);
+    }
+
     public function matieres()
     {
-        return $this->belongsToMany(Matiere::class)->withTimestamps();
+        return $this->belongsToMany(Matiere::class)
+            ->withTimestamps();
     }
 }

@@ -6,44 +6,42 @@ use App\Chapter;
 use App\Constants\CodeReferentiel;
 use App\Controle;
 use App\Question;
-use Illuminate\Database\Eloquent\Model;
-
 
 class ReadContent
 {
 
     private string $defaultContent = "Abonnez-vous pour consulter ce contenu";
 
-    public function byChapter(Chapter $chapter, bool $canReadContent)
+    public function byChapter(Chapter $chapter, bool $canAccessContent)
     {
-        if (!$canReadContent && !$chapter->is_public) {
+        if (!$canAccessContent && !$chapter->is_public) {
             $chapter->content = $this->defaultContent;
         }
         return $chapter;
     }
 
-    public function byExercise($exercise, bool $canReadContent)
+    public function byExercise($exercise, bool $canAccessContent)
     {
-        if (!$canReadContent && !$exercise->is_public) {
+        if (!$canAccessContent && !$exercise->is_public) {
             $exercise->correction = $this->defaultContent;
         }
         return $exercise;
     }
 
-    public function byControle(Controle $controle, bool $canReadContent)
+    public function byControle(Controle $controle, bool $canAccessContent)
     {
         if ($controle->type_id === CodeReferentiel::EXAMEN) {
-            if (!$canReadContent && !$controle->is_public) {
+            if (!$canAccessContent && !$controle->is_public) {
                 $controle->correction = $this->defaultContent;
             }
             return $controle;
         }
-        return $this->byExercise($controle, $canReadContent);
+        return $this->byExercise($controle, $canAccessContent);
     }
 
-    public function byQuestion(Question $question, bool $canReadQuestion)
+    public function byQuestion(Question $question, bool $canAccessQuestion)
     {
-        if (!$canReadQuestion && !$question->is_public) {
+        if (!$canAccessQuestion && !$question->is_public) {
             $question->content     = $this->defaultContent;
         }
         return $question;

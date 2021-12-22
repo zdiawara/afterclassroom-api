@@ -17,12 +17,16 @@ class CodeReferentiel
     const TRIMESTRE_2 = "trimestre_2";
     const TRIMESTRE_3 = "trimestre_3";
 
+    const SESSION_1 = "session_1";
+    const SESSION_2 = "session_2";
+
     const TYPE_EXAMEN = "type_examen";
     const FINAL_EXAMEN = "final_examen";
 
     const DEVOIR = "devoir";
     const COMPOSITION = "composition";
     const EXAMEN = "examen";
+    const REVISION = "revision";
 
     const BAC = "bac";
     const BEPC = "bepc";

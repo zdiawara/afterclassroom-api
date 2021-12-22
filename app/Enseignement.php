@@ -37,25 +37,4 @@ class Enseignement extends Model
     {
         return $this->belongsTo(Teacher::class);
     }
-
-    // public function setMatiereIdAttribute($id)
-    // {
-    //     if (!is_null($id)) {
-    //         $this->attributes['matiere_id'] = Matiere::findOrFail($id)->id;
-    //     }
-    // }
-
-    // public function setClasseIdAttribute($id)
-    // {
-    //     if (!is_null($id)) {
-    //         $this->attributes['classe_id'] = Classe::findOrFail($id)->id;
-    //     }
-    // }
-
-    // public function setTeacherIdAttribute($id)
-    // {
-    //     if (!is_null($id)) {
-    //         $this->attributes['teacher_id'] = Teacher::findOrFail($id)->id;
-    //     }
-    // }
 }

@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Classe;
+use App\Http\Requests\ControleRequest;
+use App\Http\Requests\QuestionRequest;
 use App\Exceptions\BadRequestException;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 use Symfony\Component\HttpFoundation\Request;
@@ -24,7 +26,7 @@ class Controller extends BaseController
                 $data['content'] = $content['data'];
             }
             if (isset($content['active'])) {
-                $data['active'] = $content['active'];
+                $data['is_active'] = $content['active'];
             }
         }
         return $data;
@@ -61,27 +63,32 @@ class Controller extends BaseController
         if ($request->has('type')) {
             $fields['type_id'] = $request->get('type');
         }
+        if ($request->has('accessible')) {
+            $fields['is_public'] = $request->get('accessible');
+        }
         if ($request->has('chapter')) {
             $fields['chapter_id'] = $request->get('chapter');
         }
         return $fields;
     }
 
-    protected function extractQuestionFields(Request $request)
+    protected function extractQuestionFields(QuestionRequest $request)
     {
 
         $fields =  array_merge(
             $request->only(['title']),
             $this->extractContent($request),
         );
-
-        if ($request->has('chapter')) {
-            $fields['chapter_id'] = $request->get('chapter');
+        if ($request->has('accessible')) {
+            $fields['is_public'] = $request->get('accessible');
+        }
+        if ($request->has('notion')) {
+            $fields['notion_id'] = $request->get('notion');
         }
         return $fields;
     }
 
-    protected function extractControleFields(Request $request)
+    protected function extractControleFields(ControleRequest $request)
     {
 
         $fields =  array_merge(
@@ -90,14 +97,17 @@ class Controller extends BaseController
             $this->getExerciseContent($request, 'correction')
         );
 
+        if ($request->has('accessible')) {
+            $fields['is_public'] = $request->get('accessible');
+        }
         if ($request->has('type')) {
             $fields['type_id'] = $request->get('type');
         }
         if ($request->has('trimestre')) {
             $fields['trimestre_id'] = $request->get('trimestre');
         }
-        if ($request->has('subject')) {
-            $fields['subject_id'] = $request->get('subject');
+        if ($request->has('session')) {
+            $fields['session_id'] = $request->get('session');
         }
         return $fields;
     }

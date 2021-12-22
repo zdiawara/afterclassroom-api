@@ -2,28 +2,25 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Question;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\QuestionRequest;
-use App\Http\Resources\QuestionResource;
-use App\Http\Actions\Checker\EnseignementChecker;
-use App\Http\Actions\Checker\TeacherMatiereChecker;
-use App\Http\Actions\MatiereTeacher\FindTeacherPrincipal;
-use App\Http\Actions\Question\SearchQuestion;
-use App\Http\Requests\ListQuestionRequest;
 use App\Http\Resources\NotionResource;
-use App\Question;
+use App\Http\Resources\QuestionResource;
+use App\Http\Requests\ListQuestionRequest;
+use App\Http\Actions\Question\ManageQuestion;
+use App\Http\Actions\Question\SearchQuestion;
+use App\Http\Actions\Checker\EnseignementChecker;
+use App\Http\Actions\MatiereTeacher\FindTeacherPrincipal;
 
 class QuestionController extends Controller
 {
     private $enseignementChecker;
 
-    private $teacherMatiereChecker;
-
-    public function __construct(EnseignementChecker $enseignementChecker, TeacherMatiereChecker $teacherMatiereChecker)
+    public function __construct(EnseignementChecker $enseignementChecker)
     {
         $this->middleware(['auth:api']);
         $this->enseignementChecker = $enseignementChecker;
-        $this->teacherMatiereChecker = $teacherMatiereChecker;
     }
 
     public function index(
@@ -41,50 +38,25 @@ class QuestionController extends Controller
 
     public function show(Question $question)
     {
-        $question->load(['chapter']);
+        $question->load(['notion']);
         return new QuestionResource($question);
     }
 
     /**
      * Création d'une question
      */
-    public function store(QuestionRequest $request)
+    public function store(QuestionRequest $request, ManageQuestion $manageQuestion)
     {
-        $fields = $this->extractQuestionFields($request);
-
-        $question = new Question($fields);
-
-        // Verifie que l'ut peut crée la question
-        $this->enseignementChecker->canCreate($question);
-
-        $chapter = $question->chapter;
-
-        // verifie que le teacher peut enseigner la matiere
-        $this->teacherMatiereChecker->canTeach($chapter->teacher, $chapter->matiere, true);
-
-
-        $lastQuestion = Question::where("chapter_id", $question->chapter_id)
-            ->orderBy("position", "desc")
-            ->get()
-            ->first();
-
-        if ($request->has('position')) {
-            $question->position = $request->get('position');
-        } else {
-            $question->position = isset($lastQuestion) ? $lastQuestion->position + 1 : 1;
-        }
-
-        $question->save();
-
-        //$question->load('chapter');
-
-        return new QuestionResource($question);
+        $question = new Question($this->extractQuestionFields($request));
+        return  $this->createdResponse(new QuestionResource(
+            $manageQuestion->create($question)
+        ));
     }
 
     /**
      * 
      */
-    public function update(QuestionRequest $request, Question $question)
+    public function update(QuestionRequest $request, Question $question, ManageQuestion $manageQuestion)
     {
 
         // Verifie que l'ut connecté peut modifier la question
@@ -92,14 +64,9 @@ class QuestionController extends Controller
 
         $fields = $this->extractQuestionFields($request);
 
-        $chapter = $question->chapter;
-
-        // verifie que le teacher peut enseigner la matiere
-        $this->teacherMatiereChecker->canTeach($chapter->teacher, $chapter->matiere, !isset($fields['active']));
-
-        $question->update($fields);
-
-        return $this->createdResponse(new QuestionResource($question));
+        return $this->createdResponse(new QuestionResource(
+            $manageQuestion->update($question, $fields)
+        ));
     }
 
 

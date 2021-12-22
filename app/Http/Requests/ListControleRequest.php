@@ -18,7 +18,7 @@ class ListControleRequest extends FormRequest
             'matiere' => 'required|string',
             'classe' => 'required|string',
             'teacher' => 'required_if:type,composition,devoir',
-            'trimestre' => 'required_if:type,composition,devoir',
+            // 'trimestre' => 'required_if:type,composition,devoir',
         ];
     }
 }
