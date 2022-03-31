@@ -8,7 +8,7 @@
     ],
     "license": "MIT",
     "require": {
-        "php": "8.0.0",
+        "php": "8.0.14",
         "beyondcode/laravel-websockets": "^1.11",
         "fideloper/proxy": "^4.2",
         "froiden/sql-generator": "dev-master",

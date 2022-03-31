@@ -2,17 +2,19 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Constants\CodeReferentiel;
 use App\Matiere;
 use App\Controle;
+use App\Constants\CodeReferentiel;
+use App\Http\Requests\OrderRequest;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\ControleRequest;
 use App\Http\Resources\ControleResource;
+use App\Http\Requests\ListControleRequest;
 use App\Http\Resources\ControleCollection;
+use App\Http\Actions\Controle\ListControle;
 use App\Http\Actions\Checker\EnseignementChecker;
 use App\Http\Actions\Checker\TeacherMatiereChecker;
-use App\Http\Actions\Controle\ListControle;
-use App\Http\Requests\ListControleRequest;
+use Illuminate\Http\Response;
 
 class ControleController extends Controller
 {
@@ -88,6 +90,17 @@ class ControleController extends Controller
         $this->loadDependences($controle);
 
         return $this->createdResponse(new ControleResource($controle));
+    }
+
+    public function updatePositions(OrderRequest $request)
+    {
+        $positions = $request->get('positions');
+
+        for ($i = 0; $i < sizeof($positions); $i++) {
+            Controle::where('id', $positions[$i]['id'])->update(['position' => $positions[$i]['position']]);
+        }
+
+        return response()->json(['message' => 'Positions ont été modifiées'], Response::HTTP_OK);
     }
 
     /**

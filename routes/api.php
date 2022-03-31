@@ -77,10 +77,17 @@ Route::group(['prefix' => 'exercises'], function () {
 
 // Question
 Route::apiResource('questions', "Api\QuestionController");
+Route::group(['prefix' => 'questions'], function () {
+    Route::post('/positions', 'Api\QuestionController@updatePositions')->name('questions.updatePositions');
+});
+
 // Book
 Route::apiResource('books', "Api\BookController");
 // controles
 Route::apiResource('controles', "Api\ControleController");
+Route::group(['prefix' => 'controles'], function () {
+    Route::post('/positions', 'Api\ControleController@updatePositions')->name('controles.updatePositions');
+});
 
 // College year
 Route::group(['prefix' => 'college_years'], function ($router) {

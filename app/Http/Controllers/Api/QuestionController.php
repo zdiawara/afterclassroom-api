@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Api;
 
 use App\Question;
+use Illuminate\Http\Response;
+use App\Http\Requests\OrderRequest;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\QuestionRequest;
 use App\Http\Resources\NotionResource;
@@ -67,6 +69,16 @@ class QuestionController extends Controller
         return $this->createdResponse(new QuestionResource(
             $manageQuestion->update($question, $fields)
         ));
+    }
+
+    public function updatePositions(OrderRequest $request, ManageQuestion $manageQuestion)
+    {
+        $positions = $request->get('positions');
+
+
+        $manageQuestion->updatePositions($positions);
+
+        return response()->json(['message' => 'Positions ont été modifiées'], Response::HTTP_OK);
     }
 
 

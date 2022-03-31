@@ -47,7 +47,7 @@ class ListQuestion
         ]);
 
         $questions = Queries::of($query)
-            //->orderByPosition()
+            ->orderByPosition()
             ->get();
 
         return $questions->map(fn ($question) => $this->readContent->byQuestion($question, $canAccessQuestion));

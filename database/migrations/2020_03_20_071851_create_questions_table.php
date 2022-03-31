@@ -17,6 +17,7 @@ class CreateQuestionsTable extends Migration
             $table->uuid("id")->primary();
             $table->string('title', 255);
             $table->longText('content')->nullable();
+            $table->smallInteger('position')->default(1);
             $table->boolean('is_active')->default(false);
             $table->boolean('is_public')->default(true);
             $table->uuid('notion_id');

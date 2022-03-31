@@ -35,4 +35,11 @@ class ManageQuestion
 
         return $question;
     }
+
+    public function updatePositions(array $fields)
+    {
+        for ($i = 0; $i < sizeof($fields); $i++) {
+            Question::where('id', $fields[$i]['id'])->update(['position' => $fields[$i]['position']]);
+        }
+    }
 }
